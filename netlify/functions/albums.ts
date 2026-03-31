@@ -22,6 +22,7 @@ import {
 } from './lib/api-helpers';
 import type { ApiResponse, SupportedLang } from './lib/types';
 import { updateAlbumsJson } from './lib/github-api';
+import { LEGACY_SITE_OWNER_USER_ID } from './lib/legacy-owner';
 
 interface AlbumRow {
   id: string;
@@ -279,7 +280,7 @@ export const handler: Handler = async (
       // Для POST/PUT/DELETE требуется авторизация (админка)
       const userId = event.httpMethod === 'GET' ? null : getUserIdFromEvent(event);
 
-      // Возвращаем все альбомы для указанного языка
+      // Legacy single-user mode: return albums only for old site owner.
       // Важно: используем DISTINCT ON для устранения дубликатов по album_id и lang
       // Если есть несколько альбомов с одинаковым album_id и lang, берём самый новый
       const albumsResult = await query<AlbumRow>(
@@ -301,8 +302,9 @@ export const handler: Handler = async (
              a.updated_at
          FROM albums a
          WHERE a.lang = $1 
+           AND a.user_id = $2
          ORDER BY a.album_id, a.lang, a.created_at DESC`,
-        [lang]
+        [lang, LEGACY_SITE_OWNER_USER_ID]
       );
 
       // 🔍 DEBUG: Логируем для 23-remastered

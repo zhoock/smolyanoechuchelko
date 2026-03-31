@@ -21,6 +21,7 @@ import {
   handleError,
 } from './lib/api-helpers';
 import type { ApiResponse, SupportedLang } from './lib/types';
+import { LEGACY_SITE_OWNER_USER_ID } from './lib/legacy-owner';
 
 interface ArticleRow {
   id: string;
@@ -150,6 +151,7 @@ export const handler: Handler = async (
       const articlesResult = await query<ArticleRow>(
         `SELECT DISTINCT ON (article_id)
           id,
+          user_id,
           article_id,
           name_article,
           description,
@@ -160,9 +162,10 @@ export const handler: Handler = async (
           is_draft
         FROM articles
         WHERE lang = $1
+          ${includeDrafts ? 'AND user_id = $2' : 'AND user_id = $2'}
           ${includeDrafts ? '' : 'AND (is_draft = false OR is_draft IS NULL)'}
         ORDER BY article_id, updated_at DESC`,
-        [lang]
+        [lang, includeDrafts ? userId : LEGACY_SITE_OWNER_USER_ID]
       );
 
       const articles = articlesResult.rows.map(mapArticleToApiFormat);

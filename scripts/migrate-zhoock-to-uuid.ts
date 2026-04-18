@@ -56,7 +56,6 @@ if (existsSync(envPath)) {
 import { createClient } from '@supabase/supabase-js';
 import { query, closePool } from '../netlify/functions/lib/db';
 
-const STORAGE_BUCKET_NAME = 'user-media';
 const OLD_USER_ID = 'zhoock';
 const USER_EMAIL = 'zhoock@zhoock.ru';
 
@@ -85,6 +84,9 @@ if (existsSync(envPathDefault)) {
   });
   console.log('✅ Переменные окружения загружены из .env');
 }
+
+const STORAGE_BUCKET_NAME =
+  process.env.STORAGE_BUCKET_NAME || process.env.VITE_STORAGE_BUCKET_NAME || '';
 
 function createSupabaseAdminClient() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';

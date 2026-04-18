@@ -41,7 +41,8 @@ if (existsSync(envPath)) {
 
 import { createClient } from '@supabase/supabase-js';
 
-const STORAGE_BUCKET_NAME = 'user-media';
+const STORAGE_BUCKET_NAME =
+  process.env.STORAGE_BUCKET_NAME || process.env.VITE_STORAGE_BUCKET_NAME || '';
 const USER_ID = 'zhoock';
 const STORAGE_ALBUMS_PATH = `users/${USER_ID}/albums`;
 

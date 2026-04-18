@@ -134,4 +134,4 @@ export function createSupabaseAdminClient(): SupabaseClient | null {
 /**
  * Имя бакета для хранения медиа-файлов пользователей (изображения и аудио)
  */
-export const STORAGE_BUCKET_NAME = 'user-media';
+export const STORAGE_BUCKET_NAME = import.meta.env.VITE_STORAGE_BUCKET_NAME ?? '';

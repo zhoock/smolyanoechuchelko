@@ -5,7 +5,8 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { query } from './lib/db';
-import { createSupabaseClient, STORAGE_BUCKET_NAME } from '@config/supabase';
+import { createSupabaseClient } from '@config/supabase';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 import { getUserIdFromEvent } from './lib/api-helpers';
 
 export const handler: Handler = async (

@@ -43,7 +43,8 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
-const STORAGE_BUCKET_NAME = 'user-media';
+const STORAGE_BUCKET_NAME =
+  process.env.STORAGE_BUCKET_NAME || process.env.VITE_STORAGE_BUCKET_NAME || '';
 
 function createSupabaseAdminClient() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';

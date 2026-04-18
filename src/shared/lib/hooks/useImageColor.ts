@@ -146,7 +146,7 @@ export function useImageColor(
           // для обхода CORS ограничений при извлечении цветов
           if (actualImgSrc.includes('supabase.co/storage')) {
             // Извлекаем путь к изображению из Supabase URL
-            // Формат: https://xxx.supabase.co/storage/v1/object/public/user-media/users/.../albums/...
+            // Формат: https://xxx.supabase.co/storage/v1/object/public/{bucket}/users/.../albums/...
             const urlMatch = actualImgSrc.match(/\/storage\/v1\/object\/public\/[^/]+\/(.+)$/);
             if (urlMatch) {
               const imagePath = urlMatch[1];

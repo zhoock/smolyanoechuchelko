@@ -23,6 +23,7 @@ import {
 import type { ApiResponse, SupportedLang } from './lib/types';
 import { updateAlbumsJson } from './lib/github-api';
 import { LEGACY_SITE_OWNER_USER_ID } from './lib/legacy-owner';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 
 interface AlbumRow {
   id: string;
@@ -1296,18 +1297,19 @@ export const handler: Handler = async (
                   },
                 });
 
-                const STORAGE_BUCKET_NAME = 'user-media';
-
                 // Извлекаем путь к файлу из src
                 // src может быть полным URL или относительным путем
                 let storagePath: string;
                 if (track.src.startsWith('http://') || track.src.startsWith('https://')) {
                   // Если это полный URL, извлекаем путь
                   // Формат Supabase Storage public URL:
-                  // https://{project}.supabase.co/storage/v1/object/public/user-media/users/zhoock/audio/...
-                  const urlMatch = track.src.match(/\/user-media\/(.+)$/);
-                  if (urlMatch) {
-                    storagePath = urlMatch[1];
+                  // https://{project}.supabase.co/storage/v1/object/public/{bucket}/users/.../audio/...
+                  const bucket = STORAGE_BUCKET_NAME;
+                  const prefix = bucket ? `/${bucket}/` : '';
+                  const urlIdx =
+                    bucket && prefix ? track.src.indexOf(prefix) : -1;
+                  if (urlIdx !== -1) {
+                    storagePath = track.src.slice(urlIdx + prefix.length);
                   } else {
                     // Альтернативный формат: путь после /audio/
                     const audioMatch = track.src.match(/\/audio\/(.+)$/);
@@ -1488,8 +1490,6 @@ export const handler: Handler = async (
                   detectSessionInUrl: false,
                 },
               });
-
-              const STORAGE_BUCKET_NAME = 'user-media';
 
               // Формируем пути для всех вариантов всех обложек
               const allCoverPaths: string[] = [];

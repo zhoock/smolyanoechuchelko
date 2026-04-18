@@ -14,7 +14,7 @@
 2. В левом меню выберите **Storage**
 3. Нажмите **"New bucket"**
 4. Заполните форму:
-   - **Name**: `user-media`
+   - **Name**: `your-bucket-name`
    - **Public bucket**: ✅ Включите (чтобы файлы были доступны публично)
    - **File size limit**: Установите максимальный размер (например, 10 MB)
    - **Allowed MIME types**: Оставьте пустым или укажите `image/*,audio/*`
@@ -27,7 +27,7 @@
 ### Как создать политику (пошаговая инструкция):
 
 1. В Supabase Dashboard откройте **Storage**
-2. Найдите и кликните на bucket `user-media` (или создайте его, если еще не создан)
+2. Найдите и кликните на bucket `your-bucket-name` (или создайте его, если еще не создан)
 3. В верхней части страницы bucket найдите вкладки: **Files**, **Settings**, **Policies**
 4. Кликните на вкладку **"Policies"**
 5. Нажмите кнопку **"New Policy"** (или **"Create Policy"**)
@@ -62,7 +62,7 @@
 - **Policy definition**:
 
 ```sql
-bucket_id = 'user-media'
+bucket_id = 'your-bucket-name'
 ```
 
 ### Политика 2: Пользователи могут загружать свои файлы
@@ -73,7 +73,7 @@ bucket_id = 'user-media'
 - **Policy definition**:
 
 ```sql
-bucket_id = 'user-media' AND
+bucket_id = 'your-bucket-name' AND
 (auth.uid()::text = (storage.foldername(name))[1])
 ```
 
@@ -85,7 +85,7 @@ bucket_id = 'user-media' AND
 - **Policy definition**:
 
 ```sql
-bucket_id = 'user-media' AND
+bucket_id = 'your-bucket-name' AND
 (auth.uid()::text = (storage.foldername(name))[1])
 ```
 
@@ -99,7 +99,7 @@ bucket_id = 'user-media' AND
 - **Policy definition**:
 
 ```sql
-bucket_id = 'user-media'
+bucket_id = 'your-bucket-name'
 ```
 
 **Примечание:**
@@ -107,7 +107,7 @@ bucket_id = 'user-media'
 - Эта политика разрешает загрузку любому анонимному пользователю
 - Если нужна большая безопасность, можно ограничить только папками пользователей:
   ```sql
-  bucket_id = 'user-media' AND
+  bucket_id = 'your-bucket-name' AND
   (storage.foldername(name))[1] = 'users'
   ```
 - Для продакшена рекомендуется использовать авторизацию и политики 2 и 3 вместо этой
@@ -138,6 +138,8 @@ VITE_SUPABASE_ANON_KEY=ваш_anon_ключ
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_ANON_KEY=ваш_anon_ключ
 VITE_USE_SUPABASE_STORAGE=true
+VITE_STORAGE_BUCKET_NAME=your-bucket-name
+STORAGE_BUCKET_NAME=your-bucket-name
 ```
 
 **Примечание:** `VITE_USE_SUPABASE_STORAGE=true` включает использование Supabase Storage вместо локальных файлов. Установите `false` или не добавляйте переменную, чтобы использовать локальные файлы.
@@ -233,7 +235,7 @@ async function testUpload() {
 После настройки файлы будут храниться в следующей структуре:
 
 ```
-user-media/
+your-bucket-name/
   users/
     zhoock/
       albums/
@@ -249,16 +251,16 @@ user-media/
         user_upload.jpg
 ```
 
-## 🔄 Миграция из старого bucket (user-images → user-media)
+## 🔄 Миграция из старого bucket (user-images → your-bucket-name)
 
-Если у вас уже есть bucket `user-images` и нужно переименовать его в `user-media`:
+Если у вас уже есть bucket `user-images` и нужно переименовать его в `your-bucket-name`:
 
 **Важно:** В Supabase нельзя переименовать bucket напрямую. Нужно создать новый и скопировать файлы.
 
 ### Шаг 1: Создайте новый bucket
 
 1. В Supabase Dashboard → **Storage** → **New bucket**
-2. **Name**: `user-media`
+2. **Name**: `your-bucket-name`
 3. ✅ **Public bucket**
 4. **File size limit**: 50 MB (или как у старого bucket)
 5. **Allowed MIME types**: `image/*,audio/*`
@@ -268,8 +270,8 @@ user-media/
 
 1. Откройте старый bucket `user-images` → **Policies**
 2. Скопируйте все политики
-3. Откройте новый bucket `user-media` → **Policies**
-4. Создайте те же политики, заменив `bucket_id = 'user-images'` на `bucket_id = 'user-media'`
+3. Откройте новый bucket `your-bucket-name` → **Policies**
+4. Создайте те же политики, заменив `bucket_id = 'user-images'` на `bucket_id = 'your-bucket-name'`
 
 ### Шаг 3: Запустите скрипт миграции
 
@@ -285,7 +287,7 @@ npx tsx scripts/migrate-bucket.ts
 
 ### Шаг 5: Проверка и очистка
 
-1. Проверьте файлы в новом bucket `user-media`
+1. Проверьте файлы в новом bucket `your-bucket-name`
 2. Убедитесь, что все работает корректно
 3. (Опционально) Удалите старый bucket `user-images` после проверки
 
@@ -379,7 +381,7 @@ migrateLocalFilesToStorage();
 
 ### Ошибка: "Bucket not found"
 
-- Убедитесь, что bucket `user-media` создан и публичен
+- Убедитесь, что bucket `your-bucket-name` создан и публичен
 - Проверьте название bucket в `src/config/supabase.ts`
 
 ### Ошибка: "Invalid API key"

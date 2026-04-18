@@ -5,7 +5,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-export const STORAGE_BUCKET_NAME = process.env.STORAGE_BUCKET_NAME || 'user-media';
+export const STORAGE_BUCKET_NAME = process.env.STORAGE_BUCKET_NAME ?? '';
 
 /**
  * Создает Supabase anon client (для публичных операций)

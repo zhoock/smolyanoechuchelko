@@ -6,7 +6,7 @@
 
 1. Откройте [Supabase Dashboard](https://supabase.com/dashboard/project/your-project-ref)
 2. **Storage** → **New bucket**
-3. Название: `user-media`
+3. Название: `your-bucket-name`
 4. ✅ **Public bucket** (включите)
 5. **Create bucket**
 
@@ -20,6 +20,8 @@ VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=ваш_anon_ключ
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_ANON_KEY=ваш_anon_ключ
+VITE_STORAGE_BUCKET_NAME=your-bucket-name
+STORAGE_BUCKET_NAME=your-bucket-name
 ```
 
 **Где взять ключи:**

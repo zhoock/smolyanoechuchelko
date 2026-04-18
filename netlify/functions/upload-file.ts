@@ -26,8 +26,7 @@ import {
   parseJsonBody,
 } from './lib/api-helpers';
 import { generateHeroImageVariants, extractBaseName } from './lib/image-processor';
-
-const STORAGE_BUCKET_NAME = 'user-media';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 
 function createSupabaseAdminClient() {
   // В Netlify Functions переменные с префиксом VITE_ недоступны

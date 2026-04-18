@@ -1,9 +1,9 @@
 /**
- * Скрипт для миграции файлов из bucket 'user-images' в 'user-media'
+ * Скрипт для миграции файлов между двумя bucket'ами в Supabase Storage
  *
  * Использование:
- * 1. Создайте новый bucket 'user-media' в Supabase Dashboard
- * 2. Установите те же RLS политики, что и для 'user-images'
+ * 1. Задайте STORAGE_BUCKET_LEGACY_NAME (старый) и STORAGE_BUCKET_NAME (новый) в .env
+ * 2. Установите те же RLS политики для нового bucket, что и для старого
  * 3. Запустите: npx tsx scripts/migrate-bucket.ts
  *
  * Примечание: Убедитесь, что переменные окружения VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY установлены
@@ -45,8 +45,8 @@ if (existsSync(envPath)) {
 
 import { createSupabaseClient } from '../src/config/supabase';
 
-const OLD_BUCKET = 'user-images';
-const NEW_BUCKET = 'user-media';
+const OLD_BUCKET = process.env.STORAGE_BUCKET_LEGACY_NAME || '';
+const NEW_BUCKET = process.env.STORAGE_BUCKET_NAME || process.env.VITE_STORAGE_BUCKET_NAME || '';
 
 async function listAllFiles(
   bucket: string,
@@ -141,6 +141,17 @@ async function copyFile(bucket: string, filePath: string): Promise<boolean> {
 }
 
 async function migrateBucket() {
+  if (!OLD_BUCKET || !NEW_BUCKET) {
+    console.error(
+      '❌ Задайте STORAGE_BUCKET_LEGACY_NAME (старый bucket) и STORAGE_BUCKET_NAME (новый bucket) в окружении.'
+    );
+    process.exit(1);
+  }
+  if (OLD_BUCKET === NEW_BUCKET) {
+    console.error('❌ STORAGE_BUCKET_LEGACY_NAME и STORAGE_BUCKET_NAME должны быть разными.');
+    process.exit(1);
+  }
+
   console.log('🚀 Начало миграции файлов из bucket...');
   console.log(`   Старый bucket: ${OLD_BUCKET}`);
   console.log(`   Новый bucket: ${NEW_BUCKET}\n`);

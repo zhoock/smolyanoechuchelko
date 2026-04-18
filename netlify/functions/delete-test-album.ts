@@ -17,8 +17,7 @@ import {
   requireAuth,
   parseJsonBody,
 } from './lib/api-helpers';
-
-const STORAGE_BUCKET_NAME = 'user-media';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 
 function createSupabaseAdminClient() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';

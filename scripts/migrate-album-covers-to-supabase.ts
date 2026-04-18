@@ -50,7 +50,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Конфигурация
-const STORAGE_BUCKET_NAME = 'user-media';
+const STORAGE_BUCKET_NAME =
+  process.env.STORAGE_BUCKET_NAME || process.env.VITE_STORAGE_BUCKET_NAME || '';
 const USER_ID = 'zhoock'; // ID пользователя
 const LOCAL_ALBUMS_PATH = path.join(__dirname, '../src/images/users/zhoock/albums');
 const STORAGE_ALBUMS_PATH = `users/${USER_ID}/albums`;

@@ -4,6 +4,7 @@
  */
 
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 
 export const handler: Handler = async (
   event: HandlerEvent,
@@ -57,7 +58,7 @@ export const handler: Handler = async (
     // В Netlify Functions переменные окружения доступны без VITE_ префикса
     // Сначала проверяем переменные без префикса (для продакшена), затем с префиксом (для локальной разработки)
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
-    const bucketName = 'user-media';
+    const bucketName = STORAGE_BUCKET_NAME;
 
     if (!supabaseUrl) {
       console.error('[proxy-image] Supabase URL not configured');
@@ -65,6 +66,15 @@ export const handler: Handler = async (
         statusCode: 500,
         headers: corsHeaders,
         body: JSON.stringify({ error: 'Supabase URL not configured' }),
+      };
+    }
+
+    if (!bucketName) {
+      console.error('[proxy-image] STORAGE_BUCKET_NAME not configured');
+      return {
+        statusCode: 500,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'Storage bucket not configured' }),
       };
     }
 

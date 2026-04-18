@@ -20,8 +20,7 @@ import {
   parseJsonBody,
 } from './lib/api-helpers';
 import { extractBaseName } from './lib/image-processor';
-
-const STORAGE_BUCKET_NAME = 'user-media';
+import { STORAGE_BUCKET_NAME } from './lib/supabase';
 
 function createSupabaseAdminClient() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';

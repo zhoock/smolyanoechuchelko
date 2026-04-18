@@ -19,6 +19,12 @@ if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
+const bucketName = process.env.STORAGE_BUCKET_NAME || '';
+if (!bucketName) {
+  console.error('❌ Задайте STORAGE_BUCKET_NAME');
+  process.exit(1);
+}
+
 // Получаем домены из аргументов или используем дефолтные
 const allowedOrigins = process.argv.slice(2);
 if (allowedOrigins.length === 0) {
@@ -57,8 +63,6 @@ async function setupCORS() {
     console.log('   3. Использовать прокси для изображений через ваш домен');
 
     // Альтернативное решение: создаем политику для bucket'а
-    const bucketName = 'user-media';
-
     console.log(`\n📦 Проверяем bucket "${bucketName}"...`);
 
     // Проверяем, существует ли bucket

@@ -1,0 +1,140 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node
+node_modules
+bower_components
+# SWC / Babel caches
+.swc/
+.babel-cache/
+# TypeScript incremental
+*.tsbuildinfo
+
+# Editors / IDE
+*.sublime*
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+.ionide
+.idea/
+*.iml
+.vs/
+.fleet/
+
+# Sass
+.sass-cache/
+*.css.map
+*.sass.map
+*.scss.map
+
+# Lint/format caches
+.eslintcache
+.stylelintcache
+.prettier-cache/
+
+# Assets
+# НЕ игнорируем images — нам нужны src/images/** в гите
+# Игнорим только тяжёлые исходники и мусорные директории
+**/*.psd
+**/*.ai
+**/*.sketch
+**/*.xcf
+**/thumb/**
+
+# Fonts (если нужно трекать шрифты — убери строку ниже)
+**/fonts/**
+
+# Coverage / reports
+coverage/
+**/lcov-report/**
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+.out/
+.next/
+.storybook-out/
+storybook-static/
+
+# Tool caches
+.cache/
+.parcel-cache/
+.vite/
+.turbo/
+.vercel/
+# Если используешь Yarn Berry:
+# .yarn/*
+# !.yarn/patches
+# !.yarn/plugins
+# !.yarn/releases
+# !.yarn/sdks
+# !.yarn/versions
+# .pnp.*
+# .pnp/
+
+# Temp
+tmp/
+temp/
+
+# Export files (temporary diagnostic files)
+*-export.json
+all-tracks-*.json
+tracks-export.json
+
+# Netlify
+.netlify
+
+# E2E (при наличии)
+cypress/videos/
+cypress/screenshots/
+playwright-report/
+test-results/
+blob-report/
+
+# Env
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local

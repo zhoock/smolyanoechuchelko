@@ -1,0 +1,2015 @@
+// src/pages/UserDashboard/components/EditArticleModalV2.tsx
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { Popup } from '@shared/ui/popup';
+import { useAppDispatch } from '@shared/lib/hooks/useAppDispatch';
+import { useLang } from '@app/providers/lang';
+import { getToken } from '@shared/lib/auth';
+import { fetchArticles } from '@entities/article';
+import type { IArticles } from '@models';
+import type { Block, ArticleMeta, BlockType } from './EditArticleModalV2.utils';
+import {
+  normalizeDetailsToBlocks,
+  blocksToDetails,
+  generateId,
+  debounce,
+} from './EditArticleModalV2.utils';
+import { SortableBlock } from '../../blocks/SortableBlock';
+import { SlashMenu } from '../../blocks/SlashMenu';
+import { CarouselEditModal } from '../../articles/CarouselEditModal';
+import { ArticleEditSkeleton } from '../../articles/ArticleEditSkeleton';
+import './EditArticleModalV2.style.scss';
+
+interface EditArticleModalV2Props {
+  isOpen: boolean;
+  article: IArticles;
+  onClose: () => void;
+}
+
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+const LANG_TEXTS = {
+  ru: {
+    editArticle: 'Редактирование статьи',
+    title: 'Название статьи',
+    description: 'Описание',
+    cancel: 'Отмена',
+    publish: 'Опубликовать',
+    publishing: 'Публикация...',
+    saving: 'Сохраняем...',
+    saved: 'Сохранено ✓',
+    draft: 'Черновик',
+    error: 'Ошибка',
+    articleNotFound: 'Статья не найдена',
+    articleSaved: 'Статья успешно сохранена',
+    articlePublished: 'Статья успешно опубликована',
+    savingError: 'Ошибка при сохранении',
+    addBlock: 'Добавить блок',
+    close: 'Закрыть',
+  },
+  en: {
+    editArticle: 'Edit Article',
+    title: 'Article Title',
+    description: 'Description',
+    cancel: 'Cancel',
+    publish: 'Publish',
+    publishing: 'Publishing...',
+    saving: 'Saving...',
+    saved: 'Saved ✓',
+    draft: 'Draft',
+    error: 'Error',
+    articleNotFound: 'Article not found',
+    articleSaved: 'Article saved successfully',
+    articlePublished: 'Article published successfully',
+    savingError: 'Error saving article',
+    addBlock: 'Add Block',
+    close: 'Close',
+  },
+};
+
+export function EditArticleModalV2({ isOpen, article, onClose }: EditArticleModalV2Props) {
+  const { lang } = useLang();
+  const dispatch = useAppDispatch();
+  const texts = LANG_TEXTS[lang];
+
+  // Состояние редактора
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [meta, setMeta] = useState<ArticleMeta>({ title: '', description: '' });
+  const [focusBlockId, setFocusBlockId] = useState<string | null>(null);
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Исходные значения для отслеживания изменений
+  const [initialBlocks, setInitialBlocks] = useState<Block[]>([]);
+  const [initialMeta, setInitialMeta] = useState<ArticleMeta>({ title: '', description: '' });
+
+  // История для Undo/Redo
+  type CaretPosition = {
+    blockId: string;
+    position: 'start' | 'end' | number; // 'start', 'end' или точная позиция в тексте
+  };
+
+  type EditorSnapshot = {
+    blocks: Block[];
+    meta: ArticleMeta;
+    focusBlockId: string | null;
+    selectedBlockId: string | null;
+    caretPosition?: CaretPosition | null; // Позиция каретки перед операцией
+  };
+  const [undoStack, setUndoStack] = useState<EditorSnapshot[]>([]);
+  const [redoStack, setRedoStack] = useState<EditorSnapshot[]>([]);
+  const textChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [slashMenu, setSlashMenu] = useState<{
+    blockId: string;
+    position: { top: number; left: number };
+    cursorPos: number;
+  } | null>(null);
+  const [slashMenuSelectedIndex, setSlashMenuSelectedIndex] = useState(0);
+  // VK-стиль инсертера: показывается только после Enter в конце блока
+  const [vkInserter, setVkInserter] = useState<{ afterBlockId: string } | null>(null);
+  // Модал редактирования карусели
+  const [carouselEditModal, setCarouselEditModal] = useState<{
+    blockId: string;
+    imageKeys: string[];
+    caption?: string;
+  } | null>(null);
+
+  // Ref для отложенной установки фокуса после удаления блока
+  const pendingFocusRef = useRef<{ blockId: string; position: 'start' | 'end' | number } | null>(
+    null
+  );
+
+  // Обработка Escape для скрытия VK-плюса
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && vkInserter) {
+        setVkInserter(null);
+      }
+    };
+
+    if (vkInserter) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [vkInserter]);
+
+  // Sensors для drag-and-drop
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Состояние сохранения
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [originalIsDraft, setOriginalIsDraft] = useState<boolean>(true);
+
+  // Refs для управления автосохранением
+  const isMountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [currentArticle, setCurrentArticle] = useState<IArticles | null>(null);
+
+  // Очистка таймера текстовых изменений при размонтировании
+  useEffect(() => {
+    return () => {
+      if (textChangeTimeoutRef.current) {
+        clearTimeout(textChangeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Загрузка статьи при открытии
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadArticle = async () => {
+      // Если это новая статья (articleId начинается с "new-"), пропускаем загрузку
+      if (article.articleId.startsWith('new-')) {
+        setIsLoading(false);
+        setCurrentArticle(article);
+        setOriginalIsDraft(true);
+        const initialBlocksValue: Block[] = [{ id: generateId(), type: 'paragraph', text: '' }];
+        const initialMetaValue = {
+          title: '',
+          description: '',
+        };
+        setBlocks(initialBlocksValue);
+        setMeta(initialMetaValue);
+        setInitialBlocks(JSON.parse(JSON.stringify(initialBlocksValue))); // Deep copy
+        setInitialMeta({ ...initialMetaValue });
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const token = getToken();
+        if (!token) return;
+
+        const fetchUrl = `/api/articles-api?lang=${lang}&includeDrafts=true`;
+        const response = await fetch(fetchUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const articlesList = Array.isArray(data) ? data : (data.data ?? data.articles ?? []);
+          const articleForEdit = articlesList.find(
+            (a: IArticles) => a.articleId === article.articleId
+          );
+          if (articleForEdit) {
+            setCurrentArticle(articleForEdit);
+            setOriginalIsDraft(articleForEdit.isDraft ?? true);
+
+            // Парсим details, если это строка (JSONB из базы может приходить как строка)
+            let parsedDetails = articleForEdit.details;
+            if (typeof articleForEdit.details === 'string') {
+              try {
+                parsedDetails = JSON.parse(articleForEdit.details);
+              } catch (e) {
+                parsedDetails = [];
+              }
+            }
+
+            // Убеждаемся, что details - это массив
+            if (!Array.isArray(parsedDetails)) {
+              parsedDetails = [];
+            }
+            // Инициализируем блоки и мета
+            const loadedBlocks = normalizeDetailsToBlocks(parsedDetails);
+            setBlocks(loadedBlocks);
+            setInitialBlocks(JSON.parse(JSON.stringify(loadedBlocks))); // Deep copy
+            const loadedMeta = {
+              title: articleForEdit.nameArticle || '',
+              description: articleForEdit.description || '',
+            };
+            setMeta(loadedMeta);
+            setInitialMeta({ ...loadedMeta });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading article:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadArticle();
+  }, [isOpen, article.articleId, lang]);
+
+  // Очистка при закрытии
+  useEffect(() => {
+    isMountedRef.current = isOpen;
+    if (!isOpen) {
+      // Отменяем автосохранение
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+        autoSaveTimeoutRef.current = null;
+      }
+      // Отменяем запросы
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    }
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [isOpen]);
+
+  // Автосохранение
+  const autoSave = useCallback(async () => {
+    if (!isMountedRef.current || !isOpen || !currentArticle) return;
+
+    // Для новой статьи не делаем автосохранение (только при публикации)
+    if (currentArticle.articleId.startsWith('new-')) return;
+
+    if (!currentArticle.id) return;
+
+    // Отменяем предыдущий запрос
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    setSaveStatus('saving');
+
+    try {
+      const token = getToken();
+      if (!token) return;
+
+      const details = blocksToDetails(blocks);
+      const shouldBeDraft = originalIsDraft ?? true;
+
+      const requestBody = {
+        articleId: currentArticle.articleId,
+        nameArticle: meta.title,
+        description: meta.description,
+        img: currentArticle.img || article.img || '',
+        date: currentArticle.date || article.date,
+        details: details,
+        lang: lang,
+        isDraft: shouldBeDraft,
+      };
+
+      const response = await fetch(
+        `/api/articles-api?id=${encodeURIComponent(currentArticle.id)}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+          signal: abortControllerRef.current.signal,
+        }
+      );
+
+      if (response.ok) {
+        setSaveStatus('saved');
+        setLastSaved(new Date());
+        // Обновляем Redux store
+        try {
+          await dispatch(fetchArticles({ lang, force: true })).unwrap();
+        } catch (error) {
+          console.warn('Failed to update Redux store:', error);
+        }
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Auto-save error:', error);
+        setSaveStatus('error');
+      }
+    } finally {
+      if (isMountedRef.current) {
+        // Сбрасываем статус через 2 секунды
+        setTimeout(() => {
+          if (isMountedRef.current && saveStatus === 'saved') {
+            setSaveStatus('idle');
+          }
+        }, 2000);
+      }
+    }
+  }, [blocks, meta, currentArticle, originalIsDraft, lang, dispatch, isOpen, article, saveStatus]);
+
+  // Debounced автосохранение
+  const debouncedAutoSave = useRef(
+    debounce(() => {
+      autoSave();
+    }, 1500)
+  ).current;
+
+  // Планирование автосохранения
+  useEffect(() => {
+    if (!isOpen || !currentArticle) return;
+
+    // Для новой статьи не делаем автосохранение
+    if (currentArticle.articleId.startsWith('new-')) return;
+
+    if (!currentArticle.id) return;
+
+    debouncedAutoSave();
+
+    return () => {
+      // Очистка при размонтировании
+    };
+  }, [blocks, meta, isOpen, currentArticle?.id, debouncedAutoSave]);
+
+  // Функция для сравнения двух блоков
+  const blocksAreEqual = useCallback((block1: Block, block2: Block): boolean => {
+    if (block1.id !== block2.id || block1.type !== block2.type) {
+      return false;
+    }
+
+    // Сравниваем в зависимости от типа блока
+    switch (block1.type) {
+      case 'paragraph':
+      case 'title':
+      case 'subtitle':
+      case 'quote':
+        return block1.text === (block2 as typeof block1).text;
+
+      case 'list':
+        return JSON.stringify(block1.items) === JSON.stringify((block2 as typeof block1).items);
+
+      case 'divider':
+        return true; // divider не имеет дополнительных свойств
+
+      case 'image':
+        return (
+          block1.imageKey === (block2 as typeof block1).imageKey &&
+          block1.caption === (block2 as typeof block1).caption
+        );
+
+      case 'carousel':
+        return (
+          JSON.stringify(block1.imageKeys) ===
+            JSON.stringify((block2 as typeof block1).imageKeys) &&
+          block1.caption === (block2 as typeof block1).caption
+        );
+
+      default:
+        return false;
+    }
+  }, []);
+
+  // Проверка наличия изменений
+  const hasChanges = useMemo(() => {
+    // Сравниваем блоки
+    const blocksChanged =
+      blocks.length !== initialBlocks.length ||
+      blocks.some((block, index) => {
+        const initialBlock = initialBlocks[index];
+        if (!initialBlock) return true;
+        return !blocksAreEqual(block, initialBlock);
+      });
+
+    // Сравниваем мета
+    const metaChanged =
+      meta.title !== initialMeta.title || meta.description !== initialMeta.description;
+
+    return blocksChanged || metaChanged;
+  }, [blocks, initialBlocks, meta, initialMeta, blocksAreEqual]);
+
+  // Отмена изменений
+  const handleCancel = useCallback(() => {
+    setBlocks(JSON.parse(JSON.stringify(initialBlocks))); // Deep copy
+    setMeta({ ...initialMeta });
+  }, [initialBlocks, initialMeta]);
+
+  // Обработка закрытия модального окна
+  const handleClose = useCallback(() => {
+    if (hasChanges) {
+      // Если есть изменения, отменяем их и закрываем
+      handleCancel();
+    }
+    onClose();
+  }, [hasChanges, handleCancel, onClose]);
+
+  // Публикация
+  const handlePublish = useCallback(async () => {
+    if (!currentArticle) return;
+
+    setIsPublishing(true);
+    setSaveStatus('saving');
+
+    try {
+      const token = getToken();
+      if (!token) return;
+
+      // Принудительное сохранение перед публикацией
+      const details = blocksToDetails(blocks);
+
+      // Для новой статьи генерируем articleId из timestamp, если его нет
+      let articleId = currentArticle.articleId.startsWith('new-')
+        ? currentArticle.articleId.replace('new-', '')
+        : currentArticle.articleId;
+
+      // Если articleId пустой или все еще начинается с "new-", генерируем новый
+      if (!articleId || articleId.startsWith('new-')) {
+        articleId = `article-${Date.now()}`;
+      }
+
+      const requestBody = {
+        articleId: articleId,
+        nameArticle: meta.title || 'Untitled',
+        description: meta.description || '',
+        img: currentArticle.img || article.img || '',
+        date: currentArticle.date || article.date || new Date().toISOString().split('T')[0],
+        details: details,
+        lang: lang,
+        isDraft: false, // Публикуем
+      };
+
+      // Для новой статьи используем POST, для существующей - PUT
+      const isNewArticle = currentArticle.articleId.startsWith('new-') || !currentArticle.id;
+      const url = isNewArticle
+        ? '/api/articles-api'
+        : `/api/articles-api?id=${encodeURIComponent(currentArticle.id || '')}`;
+      const method = isNewArticle ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        setSaveStatus('saved');
+        // Обновляем начальные значения после успешного сохранения
+        setInitialBlocks(JSON.parse(JSON.stringify(blocks))); // Deep copy
+        setInitialMeta({ ...meta });
+        // Обновляем Redux store
+        await dispatch(fetchArticles({ lang, force: true })).unwrap();
+        onClose();
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (error) {
+      console.error('Publish error:', error);
+      setSaveStatus('error');
+    } finally {
+      setIsPublishing(false);
+    }
+  }, [blocks, meta, currentArticle, lang, dispatch, onClose, article]);
+
+  // Создание нового блока по типу
+  const createBlock = useCallback((type: BlockType): Block => {
+    switch (type) {
+      case 'paragraph':
+        return { id: generateId(), type: 'paragraph', text: '' };
+      case 'title':
+        return { id: generateId(), type: 'title', text: '' };
+      case 'subtitle':
+        return { id: generateId(), type: 'subtitle', text: '' };
+      case 'quote':
+        return { id: generateId(), type: 'quote', text: '' };
+      case 'list':
+        return { id: generateId(), type: 'list', items: [''] };
+      case 'divider':
+        return { id: generateId(), type: 'divider' };
+      case 'image':
+        return { id: generateId(), type: 'image', imageKey: '' };
+      case 'carousel':
+        return { id: generateId(), type: 'carousel', imageKeys: [] };
+    }
+  }, []);
+
+  // Функции для работы с кареткой
+  const saveCaretPosition = useCallback((): CaretPosition | null => {
+    const activeElement = document.activeElement;
+    if (
+      activeElement &&
+      (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')
+    ) {
+      const textarea = activeElement as HTMLTextAreaElement | HTMLInputElement;
+      const blockId = textarea.getAttribute('data-block-id');
+      if (blockId) {
+        const position = textarea.selectionStart ?? 0;
+        const textLength = textarea.value.length;
+        if (position === 0) {
+          return { blockId, position: 'start' };
+        } else if (position === textLength) {
+          return { blockId, position: 'end' };
+        } else {
+          return { blockId, position: position as number };
+        }
+      }
+    }
+    // Если фокус на блоке (image/carousel), сохраняем blockId
+    if (selectedBlockId) {
+      return { blockId: selectedBlockId, position: 'end' };
+    }
+    // Если есть focusBlockId, но нет активного textarea, сохраняем его
+    if (focusBlockId) {
+      const block = blocks.find((b) => b.id === focusBlockId);
+      if (block && (block.type === 'image' || block.type === 'carousel')) {
+        return { blockId: focusBlockId, position: 'end' };
+      }
+      // Для текстовых блоков без активного textarea - конец блока
+      if (
+        block &&
+        (block.type === 'paragraph' ||
+          block.type === 'title' ||
+          block.type === 'subtitle' ||
+          block.type === 'quote')
+      ) {
+        return { blockId: focusBlockId, position: 'end' };
+      }
+    }
+    return null;
+  }, [selectedBlockId, focusBlockId, blocks]);
+
+  // Функция для вычисления целевого блока после удаления
+  const findTargetBlockAfterDelete = useCallback(
+    (deletedBlockIndex: number, newBlocks: Block[], deletedBlockType?: string): Block | null => {
+      // Правило 1: Если удаляем активный блок, сначала проверяем следующий
+      // В новом массиве индекс deletedBlockIndex указывает на блок, который был следующим
+      let emptyBlockCandidate: Block | null = null;
+      let filledBlockCandidate: Block | null = null;
+
+      // Ищем следующий текстовый блок
+      if (deletedBlockIndex < newBlocks.length) {
+        for (let i = deletedBlockIndex; i < newBlocks.length; i++) {
+          const block = newBlocks[i];
+          if (
+            block &&
+            (block.type === 'paragraph' ||
+              block.type === 'title' ||
+              block.type === 'subtitle' ||
+              block.type === 'quote')
+          ) {
+            // Правило 2: Приоритет новым пустым блокам (созданным Return)
+            if (block.text.trim() === '') {
+              emptyBlockCandidate = block;
+            } else if (!filledBlockCandidate) {
+              filledBlockCandidate = block;
+            }
+            // Если нашли пустой блок, сразу возвращаем его
+            if (emptyBlockCandidate) {
+              return emptyBlockCandidate;
+            }
+          }
+        }
+      }
+
+      // Если нашли заполненный следующий блок, возвращаем его
+      if (filledBlockCandidate) {
+        return filledBlockCandidate;
+      }
+
+      // Если не нашли следующий, ищем предыдущий текстовый блок
+      emptyBlockCandidate = null;
+      filledBlockCandidate = null;
+      for (let i = deletedBlockIndex - 1; i >= 0; i--) {
+        const block = newBlocks[i];
+        if (
+          block &&
+          (block.type === 'paragraph' ||
+            block.type === 'title' ||
+            block.type === 'subtitle' ||
+            block.type === 'quote')
+        ) {
+          // Правило 2: Приоритет новым пустым блокам (созданным Return)
+          if (block.text.trim() === '') {
+            emptyBlockCandidate = block;
+          } else if (!filledBlockCandidate) {
+            filledBlockCandidate = block;
+          }
+          // Если нашли пустой блок, сразу возвращаем его
+          if (emptyBlockCandidate) {
+            return emptyBlockCandidate;
+          }
+        }
+      }
+
+      // Возвращаем заполненный предыдущий блок, если нашли
+      if (filledBlockCandidate) {
+        return filledBlockCandidate;
+      }
+
+      // Если не нашли текстовый блок, возвращаем null (будет создан новый)
+      return null;
+    },
+    []
+  );
+
+  // Функция для установки фокуса в конец блока
+  const focusBlockEnd = useCallback((blockId: string) => {
+    setFocusBlockId(blockId);
+    // Используем requestAnimationFrame для установки фокуса после обновления DOM
+    requestAnimationFrame(() => {
+      const textarea = document.querySelector(
+        `[data-block-id="${blockId}"] textarea`
+      ) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      }
+    });
+  }, []);
+
+  const restoreCaretPosition = useCallback(
+    (caretPosition: CaretPosition | null | undefined, newBlocks: Block[]) => {
+      if (!caretPosition) return;
+
+      // Если блок всё ещё существует
+      const targetBlock = newBlocks.find((b) => b.id === caretPosition.blockId);
+      if (targetBlock) {
+        // Для текстовых блоков
+        if (
+          targetBlock.type === 'paragraph' ||
+          targetBlock.type === 'title' ||
+          targetBlock.type === 'subtitle' ||
+          targetBlock.type === 'quote'
+        ) {
+          setTimeout(() => {
+            setFocusBlockId(caretPosition.blockId);
+            const textarea = document.querySelector(
+              `[data-block-id="${caretPosition.blockId}"] textarea`
+            ) as HTMLTextAreaElement;
+            if (textarea) {
+              textarea.focus();
+              let position: number;
+              if (caretPosition.position === 'start') {
+                position = 0;
+              } else if (caretPosition.position === 'end') {
+                position = textarea.value.length;
+              } else {
+                position = Math.min(caretPosition.position as number, textarea.value.length);
+              }
+              textarea.setSelectionRange(position, position);
+            }
+          }, 0);
+          return;
+        }
+        // Для image/carousel блоков
+        if (targetBlock.type === 'image' || targetBlock.type === 'carousel') {
+          setTimeout(() => {
+            setSelectedBlockId(caretPosition.blockId);
+            setFocusBlockId(caretPosition.blockId);
+          }, 0);
+          return;
+        }
+      }
+
+      // Если блок удалился, ищем ближайший подходящий текстовый блок
+      // Ищем первый доступный текстовый блок в новом массиве
+      const targetTextBlock = newBlocks.find(
+        (block) =>
+          block &&
+          (block.type === 'paragraph' ||
+            block.type === 'title' ||
+            block.type === 'subtitle' ||
+            block.type === 'quote')
+      );
+      if (targetTextBlock) {
+        setTimeout(() => {
+          setFocusBlockId(targetTextBlock.id);
+          const textarea = document.querySelector(
+            `[data-block-id="${targetTextBlock.id}"] textarea`
+          ) as HTMLTextAreaElement;
+          if (textarea) {
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+          }
+        }, 0);
+      }
+    },
+    []
+  );
+
+  // Функции для работы с историей Undo/Redo
+  const saveSnapshot = useCallback(
+    (caretPosition?: CaretPosition | null) => {
+      const snapshot: EditorSnapshot = {
+        blocks: JSON.parse(JSON.stringify(blocks)), // Deep clone
+        meta: { ...meta },
+        focusBlockId,
+        selectedBlockId,
+        caretPosition: caretPosition !== undefined ? caretPosition : saveCaretPosition(),
+      };
+      setUndoStack((prev) => [...prev, snapshot].slice(-50)); // Ограничиваем историю 50 шагами
+      setRedoStack([]); // Очищаем redo при новом действии
+    },
+    [blocks, meta, focusBlockId, selectedBlockId, saveCaretPosition]
+  );
+
+  const restoreSnapshot = useCallback(
+    (snapshot: EditorSnapshot) => {
+      const newBlocks = JSON.parse(JSON.stringify(snapshot.blocks)) as Block[]; // Deep clone
+      setBlocks(newBlocks);
+      setMeta({ ...snapshot.meta });
+      setFocusBlockId(snapshot.focusBlockId);
+      setSelectedBlockId(snapshot.selectedBlockId);
+      // Восстанавливаем позицию каретки
+      restoreCaretPosition(snapshot.caretPosition, newBlocks);
+    },
+    [restoreCaretPosition]
+  );
+
+  const undo = useCallback(() => {
+    if (undoStack.length === 0) return;
+
+    // Сохраняем текущую позицию каретки перед undo
+    const currentCaretPosition = saveCaretPosition();
+    const currentSnapshot: EditorSnapshot = {
+      blocks: JSON.parse(JSON.stringify(blocks)),
+      meta: { ...meta },
+      focusBlockId,
+      selectedBlockId,
+      caretPosition: currentCaretPosition,
+    };
+    setRedoStack((prev) => [currentSnapshot, ...prev]);
+
+    const previousSnapshot = undoStack[undoStack.length - 1];
+    restoreSnapshot(previousSnapshot);
+    setUndoStack((prev) => prev.slice(0, -1));
+  }, [undoStack, blocks, meta, focusBlockId, selectedBlockId, restoreSnapshot, saveCaretPosition]);
+
+  const redo = useCallback(() => {
+    if (redoStack.length === 0) return;
+
+    // Сохраняем текущую позицию каретки перед redo
+    const currentCaretPosition = saveCaretPosition();
+    const currentSnapshot: EditorSnapshot = {
+      blocks: JSON.parse(JSON.stringify(blocks)),
+      meta: { ...meta },
+      focusBlockId,
+      selectedBlockId,
+      caretPosition: currentCaretPosition,
+    };
+    setUndoStack((prev) => [...prev, currentSnapshot]);
+
+    const nextSnapshot = redoStack[0];
+    restoreSnapshot(nextSnapshot);
+    setRedoStack((prev) => prev.slice(1));
+  }, [redoStack, blocks, meta, focusBlockId, selectedBlockId, restoreSnapshot, saveCaretPosition]);
+
+  // Управление блоками
+  const insertBlock = useCallback(
+    (index: number, type: BlockType) => {
+      // Сохраняем снимок перед вставкой
+      saveSnapshot();
+
+      const newBlock = createBlock(type);
+
+      setBlocks((prev) => {
+        const newBlocks = [...prev];
+        newBlocks.splice(index, 0, newBlock);
+        return newBlocks;
+      });
+
+      // Фокус на новый блок
+      setTimeout(() => {
+        setFocusBlockId(newBlock.id);
+      }, 0);
+    },
+    [createBlock, saveSnapshot]
+  );
+
+  type DeleteFocus = { blockId: string; position: 'start' | 'end' | number };
+
+  const deleteBlock = useCallback(
+    (blockId: string, forcedFocus?: DeleteFocus) => {
+      // Сохраняем позицию каретки перед удалением (для undo/redo)
+      const caretPosition = saveCaretPosition();
+      // Сохраняем снимок перед удалением
+      saveSnapshot(caretPosition);
+
+      // Если мы заранее знаем куда ставить каретку — фиксируем это ДО setBlocks
+      if (forcedFocus) {
+        pendingFocusRef.current = forcedFocus;
+      }
+
+      setBlocks((prev) => {
+        const blockIndex = prev.findIndex((b) => b.id === blockId);
+        const deletedBlock = prev.find((b) => b.id === blockId);
+        const filtered = prev.filter((b) => b.id !== blockId);
+        // Если блоков не осталось, создаем пустой paragraph
+        const newParagraph: Block = { id: generateId(), type: 'paragraph', text: '' };
+        const newBlocks = filtered.length > 0 ? filtered : [newParagraph];
+
+        // IMPORTANT: если forcedFocus уже задан — НЕ переопределяем его автологикой
+        if (!forcedFocus) {
+          // Вычисляем целевой блок ПОСЛЕ удаления (не используем origin caretPosition)
+          const deletedBlockType = deletedBlock?.type;
+          // В новом массиве индекс удаленного блока равен blockIndex (так как мы удалили его)
+          const targetBlock = findTargetBlockAfterDelete(blockIndex, newBlocks, deletedBlockType);
+
+          // Сохраняем информацию о целевом блоке для установки фокуса после обновления DOM
+          if (targetBlock) {
+            pendingFocusRef.current = { blockId: targetBlock.id, position: 'end' };
+          } else {
+            // Если не нашли целевой блок, создаем новый пустой paragraph
+            const newEmptyParagraph: Block = { id: generateId(), type: 'paragraph', text: '' };
+            pendingFocusRef.current = { blockId: newEmptyParagraph.id, position: 'start' };
+            // Добавляем новый блок в массив
+            return [...newBlocks, newEmptyParagraph];
+          }
+        }
+
+        return newBlocks;
+      });
+    },
+    [saveSnapshot, saveCaretPosition, findTargetBlockAfterDelete]
+  );
+
+  // Конвертация image в carousel
+  const convertImageToCarousel = useCallback(
+    (blockId: string) => {
+      // Сохраняем снимок перед конвертацией
+      saveSnapshot();
+
+      setBlocks((prev) =>
+        prev.map((block) => {
+          if (block.id === blockId && block.type === 'image') {
+            return {
+              id: block.id,
+              type: 'carousel',
+              imageKeys: block.imageKey ? [block.imageKey] : [],
+              caption: block.caption,
+            } as Block;
+          }
+          return block;
+        })
+      );
+      setSelectedBlockId(null);
+    },
+    [saveSnapshot]
+  );
+
+  // Обработка Delete/Backspace для удаления выделенного блока (image/carousel) и Undo/Redo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Обработка Undo/Redo (Cmd+Z / Cmd+Shift+Z / Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y)
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const metaKey = isMac ? event.metaKey : event.ctrlKey;
+      const key = event.key.toLowerCase();
+
+      // Проверяем Undo/Redo до проверки фокуса в текстовом поле
+      if (metaKey && key === 'z') {
+        if (event.shiftKey) {
+          // Redo: Cmd+Shift+Z (Mac) или Ctrl+Shift+Z (Windows)
+          event.preventDefault();
+          event.stopPropagation();
+          redo();
+          return;
+        } else {
+          // Undo: Cmd+Z (Mac) или Ctrl+Z (Windows)
+          event.preventDefault();
+          event.stopPropagation();
+          undo();
+          return;
+        }
+      }
+
+      // Redo через Ctrl+Y (Windows)
+      if (!isMac && event.ctrlKey && key === 'y') {
+        event.preventDefault();
+        event.stopPropagation();
+        redo();
+        return;
+      }
+
+      // Проверяем, что фокус не в текстовом поле (textarea/input)
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === 'TEXTAREA' ||
+          activeElement.tagName === 'INPUT' ||
+          (activeElement as HTMLElement).isContentEditable)
+      ) {
+        return; // Стандартное поведение для текстовых полей
+      }
+
+      if (selectedBlockId && (event.key === 'Delete' || event.key === 'Backspace')) {
+        const selectedBlock = blocks.find((b) => b.id === selectedBlockId);
+        if (
+          selectedBlock &&
+          (selectedBlock.type === 'image' || selectedBlock.type === 'carousel')
+        ) {
+          event.preventDefault();
+          deleteBlock(selectedBlockId);
+          setSelectedBlockId(null);
+          // Каретка будет восстановлена в deleteBlock
+        }
+      }
+    };
+
+    // Используем capture phase для перехвата события до других обработчиков
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [selectedBlockId, blocks, deleteBlock, undo, redo]);
+
+  // Установка фокуса после удаления блока (useLayoutEffect выполняется синхронно после обновления DOM)
+  useLayoutEffect(() => {
+    if (pendingFocusRef.current) {
+      const { blockId, position } = pendingFocusRef.current;
+      pendingFocusRef.current = null; // Очищаем ref
+
+      // Используем requestAnimationFrame для гарантии, что DOM обновлен
+      requestAnimationFrame(() => {
+        const textarea = document.querySelector(
+          `[data-block-id="${blockId}"] textarea`
+        ) as HTMLTextAreaElement;
+        if (textarea) {
+          setFocusBlockId(blockId);
+          textarea.focus();
+          if (position === 'start') {
+            textarea.setSelectionRange(0, 0);
+          } else if (position === 'end') {
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+          } else {
+            const pos = Math.min(position, textarea.value.length);
+            textarea.setSelectionRange(pos, pos);
+          }
+        }
+      });
+    }
+  }, [blocks]); // Зависимость от blocks, чтобы эффект срабатывал после обновления
+
+  // Снятие выделения при клике вне блока
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Проверяем, что клик не на блоке изображения или его дочерних элементах
+      if (
+        selectedBlockId &&
+        !target.closest('.edit-article-v2__block--image') &&
+        !target.closest('.edit-article-v2__block-wrapper--selected')
+      ) {
+        setSelectedBlockId(null);
+      }
+    };
+
+    if (selectedBlockId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [selectedBlockId]);
+
+  const updateBlock = useCallback(
+    (blockId: string, updates: Partial<Block>, shouldSaveHistory = false) => {
+      // Если это текстовое изменение, группируем через debounce
+      const isTextChange = 'text' in updates || 'items' in updates || 'caption' in updates;
+
+      if (isTextChange && !shouldSaveHistory) {
+        // Отменяем предыдущий таймер
+        if (textChangeTimeoutRef.current) {
+          clearTimeout(textChangeTimeoutRef.current);
+        }
+
+        // Сохраняем снимок через 500ms после последнего изменения
+        textChangeTimeoutRef.current = setTimeout(() => {
+          saveSnapshot();
+        }, 500);
+      } else if (shouldSaveHistory) {
+        // Для не-текстовых изменений (например, изменение caption) сохраняем сразу
+        saveSnapshot();
+      }
+
+      setBlocks((prev) =>
+        prev.map((block) => {
+          if (block.id !== blockId) return block;
+          // Type-safe merge
+          const updatedBlock = { ...block, ...updates } as Block;
+
+          // Если пользователь начал печатать в блоке с VK-плюсом, скрываем плюс
+          if (vkInserter?.afterBlockId === blockId) {
+            // Проверяем, что блок больше не пустой (для текстовых блоков)
+            if (
+              (updatedBlock.type === 'paragraph' ||
+                updatedBlock.type === 'title' ||
+                updatedBlock.type === 'subtitle' ||
+                updatedBlock.type === 'quote') &&
+              updatedBlock.text.trim() !== ''
+            ) {
+              setVkInserter(null);
+            }
+            // Для списка проверяем, что есть непустые элементы
+            if (
+              updatedBlock.type === 'list' &&
+              updatedBlock.items.some((item) => item.trim() !== '')
+            ) {
+              setVkInserter(null);
+            }
+          }
+
+          return updatedBlock;
+        })
+      );
+    },
+    [vkInserter, saveSnapshot]
+  );
+
+  // Обработчики для блоков
+  const handleBlockEnter = useCallback(
+    (blockId: string, atEnd: boolean) => {
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1) return;
+
+      const block = blocks[blockIndex];
+
+      if (atEnd) {
+        // Сохраняем снимок перед созданием нового блока
+        saveSnapshot();
+
+        // Вставляем новый paragraph после текущего блока
+        const newBlock = createBlock('paragraph');
+        setBlocks((prev) => {
+          const newBlocks = [...prev];
+          newBlocks.splice(blockIndex + 1, 0, newBlock);
+          return newBlocks;
+        });
+
+        // Показываем VK-плюс у нового блока
+        setVkInserter({ afterBlockId: newBlock.id });
+
+        // Фокус на новый блок и перемещаем каретку в начало
+        setTimeout(() => {
+          setFocusBlockId(newBlock.id);
+          // Находим textarea нового блока и устанавливаем курсор в начало
+          const newBlockElement = document.querySelector(
+            `[data-block-id="${newBlock.id}"] textarea`
+          ) as HTMLTextAreaElement;
+          if (newBlockElement) {
+            newBlockElement.focus();
+            newBlockElement.setSelectionRange(0, 0);
+          }
+        }, 0);
+      } else {
+        // Разрезаем блок на два (только для текстовых блоков)
+        if (
+          block.type === 'paragraph' ||
+          block.type === 'title' ||
+          block.type === 'subtitle' ||
+          block.type === 'quote'
+        ) {
+          // Сохраняем снимок перед разрезанием
+          saveSnapshot();
+
+          const textarea = document.activeElement as HTMLTextAreaElement;
+          if (textarea) {
+            const cursorPos = textarea.selectionStart;
+            const text = block.type === 'paragraph' ? block.text : block.text;
+            const beforeText = text.substring(0, cursorPos);
+            const afterText = text.substring(cursorPos);
+
+            // Обновляем текущий блок
+            updateBlock(blockId, { text: beforeText } as Partial<Block>, true);
+
+            // Вставляем новый блок после
+            const newBlock: Block =
+              block.type === 'paragraph'
+                ? { id: generateId(), type: 'paragraph', text: afterText }
+                : block.type === 'title'
+                  ? { id: generateId(), type: 'title', text: afterText }
+                  : block.type === 'subtitle'
+                    ? { id: generateId(), type: 'subtitle', text: afterText }
+                    : { id: generateId(), type: 'quote', text: afterText };
+
+            setBlocks((prev) => {
+              const newBlocks = [...prev];
+              newBlocks.splice(blockIndex + 1, 0, newBlock);
+              return newBlocks;
+            });
+
+            // Фокус на новый блок и перемещаем каретку в начало
+            setTimeout(() => {
+              setFocusBlockId(newBlock.id);
+              // Находим textarea нового блока и устанавливаем курсор в начало
+              const newBlockElement = document.querySelector(
+                `[data-block-id="${newBlock.id}"] textarea`
+              ) as HTMLTextAreaElement;
+              if (newBlockElement) {
+                newBlockElement.focus();
+                newBlockElement.setSelectionRange(0, 0);
+              }
+            }, 0);
+          }
+        }
+      }
+    },
+    [blocks, createBlock, updateBlock, saveSnapshot]
+  );
+
+  const handleBlockBackspace = useCallback(
+    (blockId: string, isEmpty: boolean, atStart: boolean = false) => {
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1) return;
+
+      const currentBlock = blocks[blockIndex];
+
+      // Если блок пустой
+      if (isEmpty) {
+        // Не удаляем, если это единственный paragraph
+        if (blocks.length === 1 && currentBlock.type === 'paragraph') {
+          return;
+        }
+
+        // Хотим как ВК: удалили пустой блок -> каретка в конец предыдущего (если есть)
+        const prev = blockIndex > 0 ? blocks[blockIndex - 1] : null;
+        const next = blockIndex < blocks.length - 1 ? blocks[blockIndex + 1] : null;
+
+        // Выбираем цель: сначала prev, если нет — next, если нет — пусть deleteBlock сам создаст paragraph
+        const target = prev ?? next;
+
+        if (
+          target &&
+          (target.type === 'paragraph' ||
+            target.type === 'title' ||
+            target.type === 'subtitle' ||
+            target.type === 'quote')
+        ) {
+          deleteBlock(blockId, { blockId: target.id, position: 'end' });
+        } else {
+          deleteBlock(blockId); // fallback на авто-логику
+        }
+        return;
+      }
+
+      // Если курсор в начале блока и есть предыдущий блок
+      if (atStart && blockIndex > 0) {
+        const prevBlock = blocks[blockIndex - 1];
+
+        // Сливаем только совместимые текстовые блоки
+        if (
+          (currentBlock.type === 'paragraph' ||
+            currentBlock.type === 'title' ||
+            currentBlock.type === 'subtitle' ||
+            currentBlock.type === 'quote') &&
+          (prevBlock.type === 'paragraph' ||
+            prevBlock.type === 'title' ||
+            prevBlock.type === 'subtitle' ||
+            prevBlock.type === 'quote')
+        ) {
+          const mergedText = prevBlock.text + currentBlock.text;
+          const mergedType = prevBlock.type; // Сохраняем тип предыдущего блока
+          const prevTextLength = prevBlock.text.length; // Сохраняем длину текста до слияния
+
+          // Обновляем предыдущий блок
+          updateBlock(prevBlock.id, { text: mergedText } as Partial<Block>);
+
+          // Удаляем текущий блок с явным указанием фокуса в место слияния
+          deleteBlock(blockId, { blockId: prevBlock.id, position: prevTextLength });
+        }
+      }
+    },
+    [blocks, deleteBlock, updateBlock]
+  );
+
+  // Drag-and-drop handlers
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (over && active.id !== over.id) {
+        // Сохраняем снимок перед перетаскиванием
+        saveSnapshot();
+
+        setBlocks((items) => {
+          const oldIndex = items.findIndex((item) => item.id === active.id);
+          const newIndex = items.findIndex((item) => item.id === over.id);
+
+          const newBlocks = arrayMove(items, oldIndex, newIndex);
+          return newBlocks;
+        });
+
+        // Фокус на перетащенный блок
+        setTimeout(() => {
+          setFocusBlockId(active.id as string);
+        }, 0);
+      }
+    },
+    [saveSnapshot]
+  );
+
+  // Дублирование блока
+  const duplicateBlock = useCallback(
+    (blockId: string) => {
+      // Сохраняем снимок перед дублированием
+      saveSnapshot();
+
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1) return;
+
+      const block = blocks[blockIndex];
+      const duplicatedBlock = { ...block, id: generateId() };
+
+      setBlocks((prev) => {
+        const newBlocks = [...prev];
+        newBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
+        return newBlocks;
+      });
+
+      setTimeout(() => {
+        setFocusBlockId(duplicatedBlock.id);
+      }, 0);
+    },
+    [blocks, saveSnapshot]
+  );
+
+  // Перемещение блока вверх/вниз
+  const moveBlockUp = useCallback(
+    (blockId: string) => {
+      // Сохраняем снимок перед перемещением
+      saveSnapshot();
+
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex <= 0) return;
+
+      setBlocks((prev) => {
+        const newBlocks = [...prev];
+        [newBlocks[blockIndex - 1], newBlocks[blockIndex]] = [
+          newBlocks[blockIndex],
+          newBlocks[blockIndex - 1],
+        ];
+        return newBlocks;
+      });
+    },
+    [blocks, saveSnapshot]
+  );
+
+  const moveBlockDown = useCallback(
+    (blockId: string) => {
+      // Сохраняем снимок перед перемещением
+      saveSnapshot();
+
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1 || blockIndex >= blocks.length - 1) return;
+
+      setBlocks((prev) => {
+        const newBlocks = [...prev];
+        [newBlocks[blockIndex], newBlocks[blockIndex + 1]] = [
+          newBlocks[blockIndex + 1],
+          newBlocks[blockIndex],
+        ];
+        return newBlocks;
+      });
+    },
+    [blocks, saveSnapshot]
+  );
+
+  // Вставка блока после указанного
+  const insertBlockAfter = useCallback(
+    (blockId: string, type: string) => {
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      if (blockIndex === -1) return;
+
+      insertBlock(blockIndex + 1, type as BlockType);
+    },
+    [blocks, insertBlock]
+  );
+
+  // Преобразование типа блока (для VK-плюса)
+  const convertBlockType = useCallback(
+    (blockId: string, newType: BlockType) => {
+      const block = blocks.find((b) => b.id === blockId);
+      if (!block) return;
+
+      // Сохраняем снимок перед преобразованием
+      saveSnapshot();
+
+      // Создаем новый блок нужного типа, но сохраняем ID текущего блока
+      let newBlock: Block;
+      switch (newType) {
+        case 'paragraph':
+          newBlock = { id: blockId, type: 'paragraph', text: '' };
+          break;
+        case 'title':
+          newBlock = { id: blockId, type: 'title', text: '' };
+          break;
+        case 'subtitle':
+          newBlock = { id: blockId, type: 'subtitle', text: '' };
+          break;
+        case 'quote':
+          newBlock = { id: blockId, type: 'quote', text: '' };
+          break;
+        case 'list':
+          newBlock = { id: blockId, type: 'list', items: [''] };
+          break;
+        case 'divider':
+          newBlock = { id: blockId, type: 'divider' };
+          break;
+        case 'image':
+          newBlock = { id: blockId, type: 'image', imageKey: '' };
+          break;
+        case 'carousel':
+          newBlock = { id: blockId, type: 'carousel', imageKeys: [] };
+          break;
+      }
+
+      // Для текстовых блоков сохраняем текст из текущего блока, если он есть
+      if (
+        (block.type === 'paragraph' ||
+          block.type === 'title' ||
+          block.type === 'subtitle' ||
+          block.type === 'quote') &&
+        (newBlock.type === 'paragraph' ||
+          newBlock.type === 'title' ||
+          newBlock.type === 'subtitle' ||
+          newBlock.type === 'quote')
+      ) {
+        (newBlock as any).text = block.text;
+      }
+
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+      setBlocks((prev) => {
+        const newBlocks = [...prev];
+        newBlocks[blockIndex] = newBlock;
+        return newBlocks;
+      });
+
+      // Фокус остается на том же блоке
+      setTimeout(() => {
+        setFocusBlockId(blockId);
+        // Устанавливаем фокус на textarea, если это текстовый блок
+        if (
+          newBlock.type === 'paragraph' ||
+          newBlock.type === 'title' ||
+          newBlock.type === 'subtitle' ||
+          newBlock.type === 'quote'
+        ) {
+          const textarea = document.querySelector(
+            `[data-block-id="${blockId}"] textarea`
+          ) as HTMLTextAreaElement;
+          if (textarea) {
+            textarea.focus();
+          }
+        } else if (newBlock.type === 'list') {
+          // Для списка устанавливаем фокус на первый input
+          const firstInput = document.querySelector(
+            `[data-block-id="${blockId}"] input[type="text"]`
+          ) as HTMLInputElement;
+          if (firstInput) {
+            firstInput.focus();
+          }
+        }
+      }, 0);
+    },
+    [blocks, saveSnapshot]
+  );
+
+  // Обработчик slash-меню
+  const handleSlash = useCallback(
+    (blockId: string, position: { top: number; left: number }, cursorPos: number) => {
+      setSlashMenu({ blockId, position, cursorPos });
+      setSlashMenuSelectedIndex(0);
+    },
+    []
+  );
+
+  // Навигация в slash-меню
+  useEffect(() => {
+    if (!slashMenu) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSlashMenuSelectedIndex((prev) => Math.min(prev + 1, 7));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSlashMenuSelectedIndex((prev) => Math.max(prev - 1, 0));
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [slashMenu]);
+
+  // Обработчик выбора из slash-меню
+  const handleSlashSelect = useCallback(
+    (type: string) => {
+      if (!slashMenu) return;
+
+      const block = blocks.find((b) => b.id === slashMenu.blockId);
+      if (
+        !block ||
+        (block.type !== 'paragraph' &&
+          block.type !== 'title' &&
+          block.type !== 'subtitle' &&
+          block.type !== 'quote')
+      ) {
+        setSlashMenu(null);
+        return;
+      }
+
+      // Удаляем "/" из текста
+      const textBefore = block.text.substring(0, slashMenu.cursorPos - 1);
+      const textAfter = block.text.substring(slashMenu.cursorPos);
+      const newText = textBefore + textAfter;
+
+      // Преобразуем текущий блок в выбранный тип
+      if (type === block.type) {
+        // Если тип совпадает, просто удаляем "/"
+        updateBlock(slashMenu.blockId, { text: newText } as Partial<Block>);
+      } else {
+        // Преобразуем блок в новый тип
+        const newBlock = createBlock(type as BlockType);
+        if (
+          newBlock.type === 'paragraph' ||
+          newBlock.type === 'title' ||
+          newBlock.type === 'subtitle' ||
+          newBlock.type === 'quote'
+        ) {
+          (newBlock as any).text = newText;
+        }
+
+        const blockIndex = blocks.findIndex((b) => b.id === slashMenu.blockId);
+        setBlocks((prev) => {
+          const newBlocks = [...prev];
+          newBlocks[blockIndex] = newBlock;
+          return newBlocks;
+        });
+
+        setTimeout(() => {
+          setFocusBlockId(newBlock.id);
+        }, 0);
+      }
+
+      setSlashMenu(null);
+    },
+    [slashMenu, blocks, updateBlock, createBlock]
+  );
+
+  // Обработчик paste
+  const handlePaste = useCallback(
+    async (blockId: string, text: string, files: File[]) => {
+      const block = blocks.find((b) => b.id === blockId);
+      if (!block) return;
+
+      const blockIndex = blocks.findIndex((b) => b.id === blockId);
+
+      // Если есть изображения, создаем Image-блоки для каждого
+      if (files.length > 0) {
+        const { uploadFile } = await import('@shared/api/storage');
+        const { CURRENT_USER_CONFIG } = await import('@config/user');
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const fileExtension = file.name.split('.').pop() || 'jpg';
+          const baseFileName = file.name.replace(/\.[^/.]+$/, '');
+          const timestamp = Date.now() + i;
+          const fileName = `article_${timestamp}_${baseFileName}.${fileExtension}`;
+          const imageKey = `article_${timestamp}_${baseFileName}`;
+
+          const url = await uploadFile({
+            userId: CURRENT_USER_CONFIG.userId,
+            file,
+            category: 'articles',
+            fileName,
+          });
+
+          if (url) {
+            const newBlock: Block = {
+              id: generateId(),
+              type: 'image',
+              imageKey,
+            };
+
+            setBlocks((prev) => {
+              const newBlocks = [...prev];
+              newBlocks.splice(blockIndex + 1 + i, 0, newBlock);
+              return newBlocks;
+            });
+          }
+        }
+
+        // Если был текст вместе с изображениями, вставляем его в текущий блок
+        if (
+          text.trim() &&
+          (block.type === 'paragraph' ||
+            block.type === 'title' ||
+            block.type === 'subtitle' ||
+            block.type === 'quote')
+        ) {
+          const textarea = document.activeElement as HTMLTextAreaElement;
+          if (textarea) {
+            const cursorPos = textarea.selectionStart;
+            const newText =
+              block.text.substring(0, cursorPos) +
+              text +
+              block.text.substring(textarea.selectionEnd);
+            updateBlock(blockId, { text: newText } as Partial<Block>);
+          }
+        }
+      } else if (text) {
+        // Многострочный текст - проверяем, нужно ли преобразовать в список
+        const lines = text.split('\n').filter((line) => line.trim());
+        if (lines.length > 2) {
+          // Создаем list-блок
+          const newBlock: Block = {
+            id: generateId(),
+            type: 'list',
+            items: lines,
+          };
+
+          setBlocks((prev) => {
+            const newBlocks = [...prev];
+            newBlocks.splice(blockIndex + 1, 0, newBlock);
+            return newBlocks;
+          });
+
+          setTimeout(() => {
+            setFocusBlockId(newBlock.id);
+          }, 0);
+        } else {
+          // Обычный текст - вставляем в текущий блок
+          if (
+            block.type === 'paragraph' ||
+            block.type === 'title' ||
+            block.type === 'subtitle' ||
+            block.type === 'quote'
+          ) {
+            const textarea = document.activeElement as HTMLTextAreaElement;
+            if (textarea) {
+              const cursorPos = textarea.selectionStart;
+              const newText =
+                block.text.substring(0, cursorPos) +
+                text +
+                block.text.substring(textarea.selectionEnd);
+              updateBlock(blockId, { text: newText } as Partial<Block>);
+
+              // Устанавливаем курсор после вставленного текста
+              setTimeout(() => {
+                textarea.focus();
+                const newCursorPos = cursorPos + text.length;
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+              }, 0);
+            }
+          }
+        }
+      }
+    },
+    [blocks, updateBlock]
+  );
+
+  // Обработчик форматирования
+  const handleFormat = useCallback(
+    (blockId: string, type: 'bold' | 'italic' | 'link') => {
+      const block = blocks.find((b) => b.id === blockId);
+      if (
+        !block ||
+        (block.type !== 'paragraph' &&
+          block.type !== 'title' &&
+          block.type !== 'subtitle' &&
+          block.type !== 'quote')
+      ) {
+        return;
+      }
+
+      // Находим textarea по blockId, а не через activeElement
+      // Это важно, так как при клике на кнопку тултипа activeElement может измениться
+      const textarea = document.querySelector(
+        `[data-block-id="${blockId}"] textarea`
+      ) as HTMLTextAreaElement;
+      if (!textarea) return;
+
+      // Восстанавливаем фокус на textarea перед получением позиции курсора
+      // Используем requestAnimationFrame чтобы убедиться, что событие клика обработано
+      requestAnimationFrame(() => {
+        textarea.focus();
+
+        const selectionStart = textarea.selectionStart;
+        const selectionEnd = textarea.selectionEnd;
+
+        if (selectionStart === selectionEnd) {
+          // Нет выделения - вставляем шаблон
+          let template = '';
+          let cursorOffset = 0;
+
+          if (type === 'bold') {
+            template = '**текст**';
+            cursorOffset = 2;
+          } else if (type === 'italic') {
+            template = '_текст_';
+            cursorOffset = 1;
+          } else if (type === 'link') {
+            template = '[текст](url)';
+            cursorOffset = 1;
+          }
+
+          const newText =
+            block.text.substring(0, selectionStart) + template + block.text.substring(selectionEnd);
+
+          updateBlock(blockId, { text: newText } as Partial<Block>);
+
+          // Устанавливаем курсор внутрь шаблона
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(
+              selectionStart + cursorOffset,
+              selectionStart + cursorOffset + 6
+            );
+          }, 0);
+        } else {
+          // Есть выделение - оборачиваем в markdown
+          const selectedText = block.text.substring(selectionStart, selectionEnd);
+          let wrappedText = '';
+
+          if (type === 'bold') {
+            wrappedText = `**${selectedText}**`;
+          } else if (type === 'italic') {
+            wrappedText = `_${selectedText}_`;
+          } else if (type === 'link') {
+            wrappedText = `[${selectedText}](url)`;
+          }
+
+          const newText =
+            block.text.substring(0, selectionStart) +
+            wrappedText +
+            block.text.substring(selectionEnd);
+
+          updateBlock(blockId, { text: newText } as Partial<Block>);
+
+          // Устанавливаем курсор после обёрнутого текста
+          setTimeout(() => {
+            textarea.focus();
+            const newCursorPos = selectionStart + wrappedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+          }, 0);
+        }
+      });
+    },
+    [blocks, updateBlock]
+  );
+
+  // Статус сохранения
+  const getStatusText = () => {
+    switch (saveStatus) {
+      case 'saving':
+        return texts.saving;
+      case 'saved':
+        return texts.saved;
+      case 'error':
+        return texts.error;
+      default:
+        return originalIsDraft ? texts.draft : '';
+    }
+  };
+
+  // Компонент VK-стиля плюса (показывается только после Enter в конце блока)
+  const VkPlusInserter = ({
+    onSelect,
+    onClose,
+  }: {
+    onSelect: (type: string) => void;
+    onClose: () => void;
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+          onClose();
+        }
+      };
+
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsOpen(false);
+          onClose();
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+          document.removeEventListener('keydown', handleEscape);
+        };
+      }
+    }, [isOpen, onClose]);
+
+    const blockTypes = [
+      { type: 'paragraph', label: 'Текст', icon: '📝' },
+      { type: 'title', label: 'Заголовок', icon: '📌' },
+      { type: 'subtitle', label: 'Подзаголовок', icon: '📍' },
+      { type: 'quote', label: 'Цитата', icon: '💬' },
+      { type: 'list', label: 'Список', icon: '📋' },
+      { type: 'divider', label: 'Разделитель', icon: '➖' },
+      { type: 'image', label: 'Изображение', icon: '🖼️' },
+      { type: 'carousel', label: 'Карусель', icon: '🎠' },
+    ];
+
+    return (
+      <div ref={menuRef} className="edit-article-v2__vk-plus">
+        <button
+          type="button"
+          className="edit-article-v2__vk-plus-button"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          +
+        </button>
+        {isOpen && (
+          <div className="edit-article-v2__vk-plus-menu">
+            {blockTypes.map(({ type, label, icon }) => (
+              <button
+                key={type}
+                type="button"
+                className="edit-article-v2__vk-plus-menu-item"
+                onClick={() => {
+                  onSelect(type);
+                  setIsOpen(false);
+                }}
+              >
+                <span className="edit-article-v2__vk-plus-menu-icon">{icon}</span>
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <Popup isActive={isOpen} onClose={handleClose}>
+      {isLoading ? (
+        //   {true ? (
+        <ArticleEditSkeleton />
+      ) : (
+        <div className="edit-article-v2">
+          <div className="edit-article-v2__container">
+            {/* Sticky Header */}
+            <div className="edit-article-v2__header">
+              <div className="edit-article-v2__header-content">
+                <input
+                  type="text"
+                  className="edit-article-v2__title-input"
+                  value={meta.title}
+                  onChange={(e) => setMeta((prev) => ({ ...prev, title: e.target.value }))}
+                  placeholder={texts.title}
+                />
+                <div className="edit-article-v2__status">{getStatusText()}</div>
+              </div>
+              <button
+                type="button"
+                className="edit-article-v2__close"
+                onClick={handleClose}
+                aria-label={texts.close}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="edit-article-v2__content article">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={blocks.map((b) => b.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="edit-article-v2__blocks">
+                    {blocks.map((block, index) => (
+                      <React.Fragment key={block.id}>
+                        <SortableBlock
+                          block={block}
+                          index={index}
+                          isFocused={focusBlockId === block.id}
+                          isSelected={selectedBlockId === block.id}
+                          showVkPlus={
+                            (vkInserter?.afterBlockId === block.id || focusBlockId === block.id) &&
+                            (((block.type === 'paragraph' ||
+                              block.type === 'title' ||
+                              block.type === 'subtitle' ||
+                              block.type === 'quote') &&
+                              block.text.trim() === '') ||
+                              (block.type === 'list' &&
+                                block.items.every((item) => item.trim() === '')))
+                          }
+                          onUpdate={updateBlock}
+                          onDelete={deleteBlock}
+                          onFocus={() => {
+                            setFocusBlockId(block.id);
+                            // Если блок пустой и vkInserter не установлен, устанавливаем его
+                            const isBlockEmpty =
+                              ((block.type === 'paragraph' ||
+                                block.type === 'title' ||
+                                block.type === 'subtitle' ||
+                                block.type === 'quote') &&
+                                block.text.trim() === '') ||
+                              (block.type === 'list' &&
+                                block.items.every((item) => item.trim() === ''));
+                            if (isBlockEmpty && vkInserter?.afterBlockId !== block.id) {
+                              setVkInserter({ afterBlockId: block.id });
+                            }
+                          }}
+                          onBlur={() => {
+                            // Используем setTimeout, чтобы проверить, куда перешел фокус
+                            // Если фокус перешел на плюс или внутри того же блока, не скрываем плюс
+                            setTimeout(() => {
+                              const activeElement = document.activeElement;
+
+                              // Проверяем, находится ли фокус на плюсе
+                              const isClickingOnVkPlus =
+                                activeElement?.closest('.edit-article-v2__vk-plus') !== null;
+
+                              // Проверяем, находится ли фокус на textarea этого блока
+                              const blockTextarea = document.querySelector(
+                                `[data-block-id="${block.id}"] textarea`
+                              ) as HTMLTextAreaElement;
+                              const isFocusOnBlockTextarea = activeElement === blockTextarea;
+
+                              // Проверяем, находится ли активный элемент в том же блоке
+                              const blockElement = activeElement?.closest(
+                                `.edit-article-v2__block-wrapper[data-block-id="${block.id}"]`
+                              );
+                              const isFocusInSameBlock = blockElement !== null;
+
+                              // Проверяем, не перешел ли фокус на другой блок редактора
+                              const isFocusOnAnotherBlock =
+                                activeElement?.tagName === 'TEXTAREA' &&
+                                activeElement?.getAttribute('data-block-id') !== null &&
+                                activeElement?.getAttribute('data-block-id') !== block.id;
+
+                              // Если фокус не на плюсе, не на textarea этого блока, не в том же блоке
+                              // и не перешел на другой блок редактора, скрываем плюс
+                              if (
+                                !isClickingOnVkPlus &&
+                                !isFocusOnBlockTextarea &&
+                                !isFocusInSameBlock &&
+                                !isFocusOnAnotherBlock
+                              ) {
+                                setFocusBlockId(null);
+                                // Скрываем плюс при потере фокуса, если блок не пустой
+                                if (vkInserter?.afterBlockId === block.id) {
+                                  const isBlockEmpty =
+                                    (block.type === 'paragraph' ||
+                                      block.type === 'title' ||
+                                      block.type === 'subtitle' ||
+                                      block.type === 'quote') &&
+                                    block.text.trim() === '';
+                                  const isListEmpty =
+                                    block.type === 'list' &&
+                                    block.items.every((item) => item.trim() === '');
+                                  if (!isBlockEmpty && !isListEmpty) {
+                                    setVkInserter(null);
+                                  }
+                                }
+                              }
+                            }, 0);
+                          }}
+                          onSelect={setSelectedBlockId}
+                          onEnter={handleBlockEnter}
+                          onBackspace={(isEmpty: boolean, atStart?: boolean) =>
+                            handleBlockBackspace(block.id, isEmpty, atStart ?? false)
+                          }
+                          onInsertAfter={insertBlockAfter}
+                          onDuplicate={duplicateBlock}
+                          onMoveUp={moveBlockUp}
+                          onMoveDown={moveBlockDown}
+                          onSlash={handleSlash}
+                          onFormat={handleFormat}
+                          onPaste={handlePaste}
+                          onConvertToCarousel={convertImageToCarousel}
+                          onVkPlusSelect={(type) => {
+                            convertBlockType(block.id, type as BlockType);
+                            setVkInserter(null);
+                          }}
+                          onVkPlusClose={() => setVkInserter(null)}
+                          onEditCarousel={(blockId) => {
+                            const carouselBlock = blocks.find((b) => b.id === blockId);
+                            if (carouselBlock && carouselBlock.type === 'carousel') {
+                              setCarouselEditModal({
+                                blockId: carouselBlock.id,
+                                imageKeys: carouselBlock.imageKeys,
+                                caption: carouselBlock.caption,
+                              });
+                            }
+                          }}
+                        />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+
+              {/* Slash menu */}
+              {slashMenu && (
+                <SlashMenu
+                  position={slashMenu!.position}
+                  onSelect={handleSlashSelect}
+                  onClose={() => setSlashMenu(null)}
+                  selectedIndex={slashMenuSelectedIndex}
+                />
+              )}
+            </div>
+
+            {/* Footer с кнопками - показывается только при наличии изменений */}
+            {hasChanges && (
+              <div className="edit-article-v2__footer">
+                <button
+                  type="button"
+                  className="edit-article-v2__button edit-article-v2__button--cancel"
+                  onClick={handleCancel}
+                >
+                  {texts.cancel}
+                </button>
+                <button
+                  type="button"
+                  className="edit-article-v2__button edit-article-v2__button--publish"
+                  onClick={handlePublish}
+                  disabled={isPublishing || saveStatus === 'saving'}
+                >
+                  {isPublishing ? texts.publishing : texts.publish}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Модал редактирования карусели */}
+          {carouselEditModal && (
+            <CarouselEditModal
+              blockId={carouselEditModal!.blockId}
+              initialImageKeys={carouselEditModal!.imageKeys}
+              initialCaption={carouselEditModal!.caption}
+              onSave={(imageKeys, caption) => {
+                // Сохраняем снимок перед изменением карусели
+                saveSnapshot();
+                updateBlock(
+                  carouselEditModal!.blockId,
+                  { imageKeys, caption } as Partial<Block>,
+                  true
+                );
+                setCarouselEditModal(null);
+              }}
+              onCancel={() => setCarouselEditModal(null)}
+            />
+          )}
+        </div>
+      )}
+    </Popup>
+  );
+}

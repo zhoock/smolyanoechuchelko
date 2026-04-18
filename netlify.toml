@@ -1,0 +1,249 @@
+[build]
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm start"
+  targetPort = 8080
+  port = 8888
+
+# ---------- Статические файлы ----------
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+  force = true
+
+# ---------- API: СНАЧАЛА САМЫЕ СПЕЦИФИЧНЫЕ ----------
+
+# Covers (draft/commit) — должны быть ДО /api/albums* и ДО /api/*
+[[redirects]]
+  from = "/api/albums/cover/draft*"
+  to = "/.netlify/functions/upload-cover-draft"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/albums/cover/commit*"
+  to = "/.netlify/functions/commit-cover"
+  status = 200
+  force = true
+
+# Synced lyrics
+[[redirects]]
+  from = "/api/synced-lyrics*"
+  to = "/.netlify/functions/synced-lyrics"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/save-synced-lyrics*"
+  to = "/.netlify/functions/synced-lyrics"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/save-track-text*"
+  to = "/.netlify/functions/save-track-text"
+  status = 200
+  force = true
+
+# Admin миграции
+[[redirects]]
+  from = "/api/apply-migrations*"
+  to = "/.netlify/functions/apply-migrations"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/migrate-json-to-db*"
+  to = "/.netlify/functions/migrate-json-to-db"
+  status = 200
+  force = true
+
+# Albums (общее правило)
+[[redirects]]
+  from = "/api/albums*"
+  to = "/.netlify/functions/albums"
+  status = 200
+  force = true
+
+# User profile
+[[redirects]]
+  from = "/api/user-profile*"
+  to = "/.netlify/functions/user-profile"
+  status = 200
+  force = true
+
+# Articles
+[[redirects]]
+  from = "/api/articles-api*"
+  to = "/.netlify/functions/articles-api"
+  status = 200
+  force = true
+
+# Proxy image
+[[redirects]]
+  from = "/api/proxy-image*"
+  to = "/.netlify/functions/proxy-image"
+  status = 200
+  force = true
+
+# Stems
+[[redirects]]
+  from = "/api/stems/upload-url*"
+  to = "/.netlify/functions/get-stem-upload-url"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/stems/delete*"
+  to = "/.netlify/functions/delete-stem"
+  status = 200
+  force = true
+
+# Auth
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/.netlify/functions/auth"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/change-password"
+  to = "/.netlify/functions/change-password"
+  status = 200
+  force = true
+
+# Upload file
+[[redirects]]
+  from = "/api/upload-file*"
+  to = "/.netlify/functions/upload-file"
+  status = 200
+  force = true
+
+# Update/check covers
+[[redirects]]
+  from = "/api/update-album-covers*"
+  to = "/.netlify/functions/update-album-covers"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/check-album-covers*"
+  to = "/.netlify/functions/check-album-covers"
+  status = 200
+  force = true
+
+# Payments
+[[redirects]]
+  from = "/api/create-payment*"
+  to = "/.netlify/functions/create-payment"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/payment-webhook*"
+  to = "/.netlify/functions/payment-webhook"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/payment-settings*"
+  to = "/.netlify/functions/payment-settings"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/get-order-status*"
+  to = "/.netlify/functions/get-order-status"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/get-payment-status*"
+  to = "/.netlify/functions/get-payment-status"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/yookassa-health*"
+  to = "/.netlify/functions/yookassa-health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/yookassa-shop-id*"
+  to = "/.netlify/functions/yookassa-shop-id"
+  status = 200
+  force = true
+
+# Purchases
+[[redirects]]
+  from = "/api/get-my-purchases*"
+  to = "/.netlify/functions/get-my-purchases"
+  status = 200
+  force = true
+
+# Test email (для тестирования отправки email)
+[[redirects]]
+  from = "/api/test-email*"
+  to = "/.netlify/functions/test-email"
+  status = 200
+  force = true
+
+# Download track
+[[redirects]]
+  from = "/api/download*"
+  to = "/.netlify/functions/download-track"
+  status = 200
+  force = true
+
+# Tracks upload
+[[redirects]]
+  from = "/api/tracks/upload-url*"
+  to = "/.netlify/functions/get-track-upload-url"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/tracks/upload*"
+  to = "/.netlify/functions/upload-tracks"
+  status = 200
+  force = true
+
+# Stems upload
+[[redirects]]
+  from = "/api/stems/upload-url*"
+  to = "/.netlify/functions/get-stem-upload-url"
+  status = 200
+  force = true
+
+# ---------- API catch-all (САМОЕ ПОСЛЕДНЕЕ ИЗ /api) ----------
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# ---------- SPA ----------
+# В dev режиме правило SPA НЕ нужно:
+# - Netlify Dev проксирует запросы на targetPort (8080)
+# - Webpack dev server обрабатывает historyApiFallback и статические файлы
+# - Правило redirects применяется ДО проксирования, что ломает статические файлы
+#
+# В production правило SPA необходимо для корректной работы client-side routing:
+# Netlify автоматически проверяет существование файла перед применением redirect,
+# поэтому статические файлы (scripts, styles, images, audio, assets) будут
+# отдаваться напрямую, а несуществующие пути будут перенаправляться на index.html
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

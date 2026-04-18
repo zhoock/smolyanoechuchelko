@@ -1,0 +1,64 @@
+// src/widgets/footer/ui/style.scss
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+.footer {
+  grid-area: footer;
+
+  .social-networks {
+    &-list {
+      display: grid;
+      grid-gap: 1.618em;
+      grid-template-columns: repeat(4, 50px);
+      margin-block-start: var(--ms-1);
+      justify-content: space-between;
+      text-align: center;
+
+      @include breakpoint(tablet) {
+        justify-content: start;
+      }
+
+      &__item {
+        font-size: var(--ms-2);
+      }
+    }
+
+    &__link {
+      color: var(--social-networks-background-color, #373633);
+
+      &:hover {
+        color: var(--link-color, #998238);
+      }
+    }
+  }
+
+  .copyright-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ms-01);
+    text-transform: capitalize;
+
+    li {
+      white-space: nowrap;
+
+      &:not(:last-child) {
+        &::after {
+          padding-left: var(--ms-01);
+          content: '|';
+        }
+      }
+    }
+  }
+
+  &__link {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--link-color, #998238);
+      text-decoration: underline;
+    }
+  }
+}

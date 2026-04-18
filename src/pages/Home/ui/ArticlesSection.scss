@@ -1,0 +1,16 @@
+// src/pages/Home/ui/ArticlesSection.scss
+@use '../../../scss/abstracts/mixins' as *;
+
+.articles {
+  &__more {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__more-button {
+    display: inline-block;
+    text-decoration: none;
+
+    @include button-variant;
+  }
+}

@@ -1,0 +1,51 @@
+// src/features/share/ui/style.scss
+@use 'sass:color';
+
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+.share-list {
+  display: grid;
+  grid-template-columns: repeat(3, min-content);
+  gap: var(--ms-01);
+
+  &__item {
+    display: none;
+
+    &:first-child,
+    &.show {
+      display: block;
+    }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--ms-2);
+    height: var(--ms-2);
+    color: var(--link-button-color, #dddddd);
+    background: var(--link-button-background-color, #373633);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+    aspect-ratio: 1;
+
+    &:hover {
+      color: var(--link-color-hover, #ffffff);
+      background-color: var(--link-button-background-color-hover, #998238);
+
+      @media (hover: none) and (pointer: coarse) {
+        color: inherit;
+        background-color: var(--link-button-background-color, #373633);
+        transition: none;
+      }
+    }
+
+    &.active {
+      color: var(--link-color-hover, #ffffff);
+      background-color: var(--accent-color, #998238);
+    }
+  }
+}

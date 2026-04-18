@@ -1,0 +1,1137 @@
+[
+  {
+    "albumId": "23-remastered",
+    "artist": "Смоляное чучелко",
+    "album": "23 (Remastered)",
+    "fullName": "Смоляное чучелко — 23 (Remastered)",
+    "description": "A remastered version of Смоляное чучелко album 23, released in January 2022. Includes remixes of all tracks made in 2024, as well as a redesigned cover. A player, links to streaming services and stores, lyrics, and detailed information about the recording are included.",
+    "cover": "smolyanoe-chuchelko-Cover-23-remastered",
+    "release": {
+      "date": "2025-02-20",
+      "UPC": "5016122320228/199199051297",
+      "photographer": "Hans Jacob Haarseth",
+      "photographerURL": "https://www.instagram.com/vedonas/",
+      "designer": "Yaroslav Zhuk"
+    },
+    "buttons": {
+      "itunes": "https://music.apple.com/us/album/23-remastered-single/1796173891?at=1000lqjf&ct=bq&uo=4&app=itunes&Is=1&ls=1",
+      "bandcamp": "https://smolyanoechuchelko.bandcamp.com/album/23-remastered",
+      "amazon": "https://music.amazon.com/albums/B0DWMZJJ27",
+      "apple": "https://music.apple.com/us/album/23-remastered-single/1796173891",
+      "vk": "https://vk.com/music/album/-2000234662_23234662_c5116b1aacf6691de0",
+      "youtube": "https://music.youtube.com/channel/UCHYsBnMXDBe1LlJuh4VTO_Q",
+      "spotify": "https://open.spotify.com/album/2Aist88JGzHIM80lQz8RGc",
+      "yandex": "https://music.yandex.ru/album/35351911",
+      "deezer": "https://www.deezer.com/ru/album/710642121",
+      "tidal": "https://listen.tidal.com/artist/19213146"
+    },
+    "details": [
+      {
+        "id": 1,
+        "title": "Genre",
+        "content": ["grunge", "alternative rock"]
+      },
+      {
+        "id": 2,
+        "title": "Recorded At",
+        "content": [
+          {
+            "dateFrom": "2021-09-28",
+            "studioText": "Igor Matvienko's recording studio M.A.M.A, Big studio",
+            "city": "Moscow",
+            "url": "https://studio-mama.ru/"
+          },
+          {
+            "dateFrom": "2021-11-01",
+            "studioText": "DTH Studios, Studio A",
+            "city": "Moscow",
+            "url": "http://dthstudios.com/studios"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Mixed At",
+        "content": [
+          {
+            "dateFrom": "2024-01-14",
+            "dateTo": "2024-09-22",
+            "studioText": "DTH Studios, Studio A",
+            "city": "Moscow",
+            "url": "http://dthstudios.com/studios"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Mastered By",
+        "content": [
+          {
+            "dateFrom": "2025-01-14",
+            "dateTo": "2025-02-07",
+            "studioText": "Chicago Mastering Service",
+            "city": "Chicago, USA",
+            "url": "https://chicagomasteringservice.com/"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Band members",
+        "content": [
+          {
+            "text": ["", "Yaroslav Zhuk", " — lead vocals, backing vocals, words and music."],
+            "link": "https://www.instagram.com/yaroslav_zhoock/"
+          },
+          {
+            "text": ["", "Nikita Mineev", " — bass."],
+            "link": "https://www.instagram.com/chinkaychi/"
+          },
+          "",
+          {
+            "text": ["", "Oleg Ingiozov", " — drums."],
+            "link": "https://www.instagram.com/ingiozov/"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Producing",
+        "content": [
+          {
+            "text": ["Yaroslav Zhuk", "producer."]
+          },
+          {
+            "text": ["Ilya Marvel Gorokhvodatsky", "recording/mixing."],
+            "link": "https://www.instagram.com/ilya_marvel/"
+          },
+          {
+            "text": ["Mettew J. Barnhart", "mastering."],
+            "link": "https://www.matthewbarnhart.com/"
+          }
+        ]
+      }
+    ],
+    "tracks": [
+      {
+        "id": 1,
+        "title": "Фиджийская русалка Барнума (2025 Mix)",
+        "content": "\nФанзины, флаеры\nОтбитый стафф\nВ фаворе каперы\nИ DIY\n    \nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл\n\nПротухший бабл-гам\nКоммодити \nЧумные доктора\nКопром кишки\n\nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл\n\nФанзины, флаеры\nОтбитый стафф\nВ фаворе каперы\nИ DIY\n\nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл",
+        "src": "/audio/23-Remastered/01-Barnums-Fijian-Mermaid-1644.wav",
+        "syncedLyrics": [
+          {
+            "text": "Фанзины, флаеры",
+            "startTime": 20.332511,
+            "endTime": 24.319854
+          },
+          {
+            "text": "Отбитый стафф",
+            "startTime": 24.319854,
+            "endTime": 28.309688
+          },
+          {
+            "text": "В фаворе каперы",
+            "startTime": 28.309688,
+            "endTime": 32.287378
+          },
+          {
+            "text": "И DIY",
+            "startTime": 32.287378,
+            "endTime": 36.272967
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 36.272967,
+            "endTime": 40.265106
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 40.265106,
+            "endTime": 43.977397
+          },
+          {
+            "text": "Жир, соль глотай",
+            "startTime": 43.977397,
+            "endTime": 47.964287
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 47.964287,
+            "endTime": 49.823306
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 49.823306,
+            "endTime": 53.804753
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 53.804753,
+            "endTime": 57.790335
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 57.790335,
+            "endTime": 61.778513
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 61.778513,
+            "endTime": 65.75287
+          },
+          {
+            "text": "Протухший бабл-гам",
+            "startTime": 65.75287,
+            "endTime": 69.74423
+          },
+          {
+            "text": "Коммодити",
+            "startTime": 69.74423,
+            "endTime": 73.732348
+          },
+          {
+            "text": "Чумные доктора",
+            "startTime": 73.732348,
+            "endTime": 77.442134
+          },
+          {
+            "text": "Копром кишки",
+            "startTime": 77.442134,
+            "endTime": 81.431838
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 81.431838,
+            "endTime": 85.683545
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 85.683545,
+            "endTime": 89.396438
+          },
+          {
+            "text": "Жир, соль глотай",
+            "startTime": 89.396438,
+            "endTime": 93.389438
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 93.389438,
+            "endTime": 95.253159
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 95.253159,
+            "endTime": 99.224558
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 99.224558,
+            "endTime": 103.214573
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 103.214573,
+            "endTime": 107.199313
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 107.199313,
+            "endTime": 109.585587
+          },
+          {
+            "text": "Фанзины, флаеры",
+            "startTime": 109.585587,
+            "endTime": 113.571727
+          },
+          {
+            "text": "Отбитый стафф",
+            "startTime": 113.571727,
+            "endTime": 117.292923
+          },
+          {
+            "text": "В фаворе каперы",
+            "startTime": 117.292923,
+            "endTime": 121.269029
+          },
+          {
+            "text": "И DIY",
+            "startTime": 121.269029,
+            "endTime": 125.258277
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 125.258277,
+            "endTime": 129.244757
+          },
+          {
+            "text": "Дави на край",
+            "startTime": 129.244757,
+            "endTime": 133.224646
+          },
+          {
+            "text": "Жир, соль глотай",
+            "startTime": 133.224646,
+            "endTime": 137.210895
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 137.210895,
+            "endTime": 139.554923
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 147.036108,
+            "endTime": 151.026317
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 151.026317,
+            "endTime": 155.015893
+          },
+          {
+            "text": "Грязный лоу-фай",
+            "startTime": 155.015893,
+            "endTime": 158.992821
+          },
+          {
+            "text": "Кукла в платье бэби-долл",
+            "startTime": 158.992821,
+            "endTime": 163.051971
+          },
+          {
+            "text": "Ярослав Жук",
+            "startTime": 163.051971
+          }
+        ],
+        "authorship": "Ярослав Жук"
+      },
+      {
+        "id": 2,
+        "title": "Слипер (2025 Mix)",
+        "content": "\nБутафорный дайс\nЧёрно-белый дайс\nБутафорный, бутафорный\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\n\nБара-манга net\nМёртвых хикки след\nБара-манга, бара-манга\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\n\nБутафорный дайс\nЧёрно-белый дайс\nБутафорный, бутафорный\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп",
+        "src": "/audio/23-Remastered/02-Sleeper-1644.wav"
+      },
+      {
+        "id": 3,
+        "title": "Швайс (2025 Mix)",
+        "content": "\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, что тебя нет\n\t\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\t\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп для\n\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nСтыд и злость,\nВ ушах нарастающий гул\n\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\t\nДень удался\nЧудесный день",
+        "src": "/audio/23-Remastered/03-Schweiz-1644.wav",
+        "syncedLyrics": [
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 0,
+            "endTime": 3.602891
+          },
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 3.602891,
+            "endTime": 7.049815
+          },
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 7.049815,
+            "endTime": 10.241881
+          },
+          {
+            "text": "Знаю, что тебя",
+            "startTime": 10.241881,
+            "endTime": 12.100924
+          },
+          {
+            "text": "Нет",
+            "startTime": 12.100924,
+            "endTime": 14.227852
+          },
+          {
+            "text": "Швайс",
+            "startTime": 14.227852,
+            "endTime": 15.820009
+          },
+          {
+            "text": "Швайс",
+            "startTime": 15.820009,
+            "endTime": 17.419413
+          },
+          {
+            "text": "Швайс",
+            "startTime": 17.419413,
+            "endTime": 19.00525
+          },
+          {
+            "text": "Швайс",
+            "startTime": 19.00525,
+            "endTime": 20.61767
+          },
+          {
+            "text": "Швайс",
+            "startTime": 20.61767,
+            "endTime": 22.476997
+          },
+          {
+            "text": "Швайс",
+            "startTime": 22.476997,
+            "endTime": 24.07094
+          },
+          {
+            "text": "Швайс",
+            "startTime": 24.07094,
+            "endTime": 25.668491
+          },
+          {
+            "text": "Швайс",
+            "startTime": 25.668491,
+            "endTime": 26.734359
+          },
+          {
+            "text": "Слишком глуп",
+            "startTime": 26.734359,
+            "endTime": 28.580678
+          },
+          {
+            "text": "Для вмороженных в лёд",
+            "startTime": 28.580678,
+            "endTime": 30.175188
+          },
+          {
+            "text": "Слишком глуп",
+            "startTime": 30.175188,
+            "endTime": 31.772056
+          },
+          {
+            "text": "Для вмороженных в лёд",
+            "startTime": 31.772056,
+            "endTime": 33.366016
+          },
+          {
+            "text": "Слишком глуп",
+            "startTime": 33.366016,
+            "endTime": 35.225851
+          },
+          {
+            "text": "Для вмороженных в лёд",
+            "startTime": 35.225851,
+            "endTime": 36.559413
+          },
+          {
+            "text": "Слишком глуп",
+            "startTime": 36.559413,
+            "endTime": 38.422954
+          },
+          {
+            "text": "Для",
+            "startTime": 38.422954,
+            "endTime": 40.53471
+          },
+          {
+            "text": "Швайс",
+            "startTime": 40.53471,
+            "endTime": 42.393952
+          },
+          {
+            "text": "Швайс",
+            "startTime": 42.393952,
+            "endTime": 43.990089
+          },
+          {
+            "text": "Швайс",
+            "startTime": 43.990089,
+            "endTime": 45.584623
+          },
+          {
+            "text": "Швайс",
+            "startTime": 45.584623,
+            "endTime": 48.774353
+          },
+          {
+            "text": "Швайс",
+            "startTime": 48.774353,
+            "endTime": 50.370437
+          },
+          {
+            "text": "Швайс",
+            "startTime": 50.370437,
+            "endTime": 52.22826
+          },
+          {
+            "text": "Швайс",
+            "startTime": 52.22826,
+            "endTime": 52.290568
+          },
+          {
+            "text": "Швайс",
+            "startTime": 52.290568,
+            "endTime": 53.085278
+          },
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 53.085278,
+            "endTime": 59.735966
+          },
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 59.735966,
+            "endTime": 66.373132
+          },
+          {
+            "text": "Знаю, у тебя нет хорошей мечты",
+            "startTime": 66.373132,
+            "endTime": 72.755774
+          },
+          {
+            "text": "Стыд и злость, в ушах нарастающий гул",
+            "startTime": 72.755774,
+            "endTime": 79.725223
+          },
+          {
+            "text": "Швайс",
+            "startTime": 93.47001,
+            "endTime": 95.064242
+          },
+          {
+            "text": "Швайс",
+            "startTime": 95.064242,
+            "endTime": 96.659455
+          },
+          {
+            "text": "Швайс",
+            "startTime": 96.659455,
+            "endTime": 98.245424
+          },
+          {
+            "text": "Швайс",
+            "startTime": 98.245424,
+            "endTime": 99.838713
+          },
+          {
+            "text": "Швайс",
+            "startTime": 99.838713,
+            "endTime": 101.436455
+          },
+          {
+            "text": "Швайс",
+            "startTime": 101.436455,
+            "endTime": 103.03363
+          },
+          {
+            "text": "Швайс",
+            "startTime": 103.03363,
+            "endTime": 104.909555
+          },
+          {
+            "text": "Швайс",
+            "startTime": 104.909555,
+            "endTime": 107.618913
+          },
+          {
+            "text": "День удался",
+            "startTime": 115.537169,
+            "endTime": 118.17918
+          },
+          {
+            "text": "Чудесный день",
+            "startTime": 118.17918,
+            "endTime": 120.489782
+          },
+          {
+            "text": "Ярослав Жук",
+            "startTime": 120.489782
+          }
+        ],
+        "authorship": "Ярослав Жук"
+      }
+    ]
+  },
+  {
+    "albumId": "23",
+    "artist": "Смоляное чучелко",
+    "album": "23",
+    "fullName": "Смоляное чучелко — 23",
+    "description": "The album Смоляное чучелко — 23, released in January 2022, includes a player, links to streaming services and stores, as well as lyrics and detailed information about the recording.",
+    "cover": "smolyanoe-chuchelko-Cover-23",
+    "release": {
+      "date": "2022-01-23",
+      "UPC": "198003011083/198002899538",
+      "photographer": "Hans Jacob Haarseth",
+      "photographerURL": "https://www.instagram.com/vedonas/",
+      "designer": "Yaroslav Zhuk"
+    },
+    "buttons": {
+      "itunes": "https://music.apple.com/us/album/23-single/1604100999?at=1000lqjf&ct=bq&uo=4&app=itunes&Is=1&ls=1",
+      "bandcamp": "https://smolyanoechuchelko.bandcamp.com/album/23",
+      "amazon": "https://music.amazon.com/albums/B09PQ7VV7D?tag=bandlnk-20",
+      "apple": "https://music.apple.com/us/album/23-single/1604100999",
+      "vk": "https://vk.com/music/album/-2000261714_14261714_fd2045122e6407c160",
+      "youtube": "https://music.youtube.com/playlist?list=OLAK5uy_kyipWPjQMZME10sEGO804LM9X_kfBdT28",
+      "spotify": "https://open.spotify.com/album/64UnYHDHDTSsfNyKSNSHHG",
+      "yandex": "https://music.yandex.ru/album/20403610",
+      "deezer": "https://www.deezer.com/ru/album/285303392",
+      "tidal": "https://listen.tidal.com/album/211242116"
+    },
+    "details": [
+      {
+        "id": 1,
+        "title": "Genre",
+        "content": ["grunge", "alternative rock"]
+      },
+      {
+        "id": 2,
+        "title": "Recorded At",
+        "content": [
+          {
+            "dateFrom": "2021-09-28",
+            "studioText": "Igor Matvienko's recording studio M.A.M.A, Big studio",
+            "city": "Moscow",
+            "url": "https://studio-mama.ru/"
+          },
+          {
+            "dateFrom": "2021-11-01",
+            "studioText": "DTH Studios, Studio A",
+            "city": "Moscow",
+            "url": "http://dthstudios.com/studios"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Mixed At",
+        "content": [
+          {
+            "dateFrom": "2021-11-16",
+            "dateTo": "2021-11-17",
+            "studioText": "Recording studio \"Vintage Records\"",
+            "city": "Moscow",
+            "url": "https://vintage.studio/about/large-equipment-room"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Mastered By",
+        "content": [
+          {
+            "dateFrom": "2021-11-30",
+            "dateTo": "2021-12-04",
+            "studioText": "Chicago Mastering Service",
+            "city": "Chicago, USA",
+            "url": "https://chicagomasteringservice.com/"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Band members",
+        "content": [
+          {
+            "text": ["", "Yaroslav Zhuk", " — lead vocals, backing vocals, words and music."],
+            "link": "https://www.instagram.com/yaroslav_zhoock/"
+          },
+          {
+            "text": ["", "Nikita Mineev", " — bass."],
+            "link": "https://www.instagram.com/chinkaychi/"
+          },
+          "",
+          {
+            "text": ["", "Oleg Ingiozov", " — drums."],
+            "link": "https://www.instagram.com/ingiozov/"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Producing",
+        "content": [
+          {
+            "text": ["Yaroslav Zhuk", "producer."]
+          },
+          {
+            "text": ["Ilya Marvel Gorokhvodatsky", "recording/mixing."],
+            "link": "https://www.instagram.com/ilya_marvel/"
+          },
+          {
+            "text": ["Mettew J. Barnhart", "mastering."],
+            "link": "https://www.matthewbarnhart.com/"
+          }
+        ]
+      }
+    ],
+    "tracks": [
+      {
+        "id": 1,
+        "title": "Фиджийская русалка Барнума",
+        "content": "\nФанзины, флаеры\nОтбитый стафф\nВ фаворе каперы\nИ DIY\n    \nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл\n\nПротухший бабл-гам\nКоммодити \nЧумные доктора\nКопром кишки\n\nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл\n\nФанзины, флаеры\nОтбитый стафф\nВ фаворе каперы\nИ DIY\n\nДави на край\nДави на край\nЖир, соль глотай\nГрязный лоу-фай\n\nГрязный лоу-фай\nКукла в платье бэби-долл\nГрязный лоу-фай\nКукла в платье бэби-долл",
+        "src": "/audio/23/01-Barnums-Fijian-Mermaid-1644.wav"
+      },
+      {
+        "id": 2,
+        "title": "Слипер",
+        "content": "\nБутафорный дайс\nЧёрно-белый дайс\nБутафорный, бутафорный\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\n\nБара-манга net\nМёртвых хикки след\nБара-манга, бара-манга\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\n\nБутафорный дайс\nЧёрно-белый дайс\nБутафорный, бутафорный\n\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп\nХайвей\nНа дисплей\nВбей мне кляп\nВсунь в слип страп",
+        "src": "/audio/23/02-Sleeper-1644.wav"
+      },
+      {
+        "id": 3,
+        "title": "Швайс",
+        "content": "\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, что тебя нет\n\t\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\t\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп\nДля вмороженных в лёд\nСлишком глуп для\n\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nЗнаю, у тебя\nНет хорошей мечты\nСтыд и злость,\nВ ушах нарастающий гул\n\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\nШвайс\n\t\nДень удался\nЧудесный день",
+        "src": "/audio/23/03-Schweiz-1644.wav"
+      }
+    ]
+  },
+  {
+    "albumId": "smolyanoechuchelko",
+    "artist": "Смоляное чучелко",
+    "album": "Смоляное чучелко",
+    "fullName": "Смоляное чучелко — Смоляное чучелко",
+    "description": "Смоляное чучелко debut EP, released in April 2020. Includes a player, links to streaming services and stores, as well as lyrics and detailed information about the recording.",
+    "cover": "smolyanoe-chuchelko-Cover",
+    "release": {
+      "date": "2020-04-16",
+      "UPC": "195079279966",
+      "designer": "Blexbolex",
+      "designerURL": "https://en.wikipedia.org/wiki/Blexbolex"
+    },
+    "buttons": {
+      "itunes": "https://music.apple.com/ru/album/%D1%81%D0%BC%D0%BE%D0%BB%D1%8F%D0%BD%D0%BE%D0%B5-%D1%87%D1%83%D1%87%D0%B5%D0%BB%D0%BA%D0%BE-ep/1509238927?at=1000lqjf&ct=bq&uo=4&app=itunes&Is=1&ls=1",
+      "bandcamp": "https://smolyanoechuchelko.bandcamp.com/album/-",
+      "amazon": "https://music.amazon.com/albums/B087PNS8WH",
+      "apple": "https://music.apple.com/ru/album/%D1%81%D0%BC%D0%BE%D0%BB%D1%8F%D0%BD%D0%BE%D0%B5-%D1%87%D1%83%D1%87%D0%B5%D0%BB%D0%BA%D0%BE-ep/1509238927",
+      "vk": "https://vk.com/music/album/-2000269477_7269477_bba1bfe909be511c07?act=album",
+      "youtube": "https://music.youtube.com/playlist?list=OLAK5uy_luccgS_47OsZN8YlvJPNTsZgTRDdReSOk",
+      "spotify": "https://open.spotify.com/album/6vr5jlUpTMT2rmTlsThZxc",
+      "yandex": "https://music.yandex.ru/album/10541546",
+      "deezer": "https://www.deezer.com/ru/album/143471132",
+      "tidal": "https://listen.tidal.com/album/138320502"
+    },
+    "details": [
+      {
+        "id": 1,
+        "title": "Genre",
+        "content": ["grunge", "alternative rock"]
+      },
+      {
+        "id": 2,
+        "title": "Recorded At",
+        "content": [
+          {
+            "dateFrom": "2018-10-16",
+            "dateTo": "2018-12-28",
+            "studioText": "Igor Matvienko's recording studio M.A.M.A, Big studio",
+            "city": "Moscow",
+            "url": "https://studio-mama.ru/"
+          },
+          {
+            "dateFrom": "2018-11-02",
+            "studioText": "Alexey Muskatin's Production Center",
+            "city": "Moscow",
+            "url": null
+          },
+          {
+            "dateFrom": "2019-10-04",
+            "studioText": "Studio Cosmos",
+            "city": "Moscow",
+            "url": null
+          },
+          {
+            "dateFrom": "2019-10-09",
+            "dateTo": "2019-12-14",
+            "studioText": "495 Studio Records",
+            "city": "Moscow",
+            "url": null
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Mixed At",
+        "content": [
+          {
+            "dateFrom": "2019-12-15",
+            "dateTo": "2020-03-02",
+            "studioText": "DTH Studios, Studio A, Studio B",
+            "city": "Moscow",
+            "url": "http://dthstudios.com/studios"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Mastered By",
+        "content": [
+          {
+            "dateFrom": "2020-03-31",
+            "dateTo": "2020-04-10",
+            "studioText": "Chicago Mastering Service",
+            "city": "Chicago, USA",
+            "url": "https://chicagomasteringservice.com/"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Band members",
+        "content": [
+          {
+            "text": ["", "Yaroslav Zhuk", " — lead vocals, backing vocals, words and music."],
+            "link": "https://www.instagram.com/yaroslav_zhoock/"
+          },
+          "Semyon Lepeshkin — bass."
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Session musicians",
+        "content": [
+          {
+            "text": ["", "Alexey Yezhivich", " — drums."],
+            "link": "https://www.instagram.com/alexezhivich/"
+          },
+          {
+            "text": ["", "Natalia Khmelevskaya", " — cello («Водянистая влага»)."],
+            "link": "https://www.instagram.com/nkhmelevskaya/"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Producing",
+        "content": [
+          {
+            "text": ["Yaroslav Zhuk", "producer."]
+          },
+          {
+            "text": ["Ilya Lukashev", "sound engineer."]
+          },
+          {
+            "text": ["Yuri Kateshev", "sound engineer (cello recording)."]
+          },
+          {
+            "text": ["Anton Artisyuk", "sound engineer (acoustic guitar recording)."]
+          },
+          {
+            "text": ["Alexander Kolesnikov", "sound engineer (vocals recording)."]
+          },
+          {
+            "text": ["", "Ilya Marvel Gorokhvodatsky", " - mixing."],
+            "link": "https://www.instagram.com/ilya_marvel/"
+          },
+          {
+            "text": ["Mettew J. Barnhart", "mastering."],
+            "link": "https://www.matthewbarnhart.com/"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "This post would not have been possible without:",
+        "content": [
+          "Galina Zhuk, Arkady Zhuk, Kristina Shpak, Sergey Ryabov, Ilya Bykov, Anton Sapfirov, Steve Albini, Kurt Cobain."
+        ]
+      }
+    ],
+    "tracks": [
+      {
+        "id": 1,
+        "title": "Последний поршневый бомбардировщик",
+        "content": "\nВыбери шоу\nВыбери пол\nВыбери хлор и беконовый ролл\n\nБей в барабан\nЦирк обезьян\nСмех на заказ ещё раз\n\nСон, удалённый тошнотой\nИнтерферон, зовущий рой\nДырка в клею солдатских жвал\nКости за борт — я завязал\n\nВыбери панк\nВыбери джанк\nЧёрный укол и осиновый кол\n\nПей дуракол\nЛай и играй\nБрюхо вспорол мой парный сай\n\nСон, удалённый тошнотой\nИнтерферон, зовущий рой\nДырка в клею солдатских жвал\nКости за борт — я завязал\n\nСон, удалённый тошнотой\nИнтерферон, зовущий рой\nДырка в клею солдатских жвал\nКости за борт — я завязал",
+        "src": "/audio/smolyanoechuchelko/01-The-last-piston-bomber-1644.wav",
+        "syncedLyrics": [
+          {
+            "text": "Выбери шоу",
+            "startTime": 10.244651,
+            "endTime": 12.10401
+          },
+          {
+            "text": "Выбери пол",
+            "startTime": 12.10401,
+            "endTime": 13.968674
+          },
+          {
+            "text": "Выбери хлор и беконовый ролл",
+            "startTime": 13.968674,
+            "endTime": 17.690761
+          },
+          {
+            "text": "Бей в барабан",
+            "startTime": 17.690761,
+            "endTime": 19.540322
+          },
+          {
+            "text": "Цирк обезьян",
+            "startTime": 19.540322,
+            "endTime": 21.400441
+          },
+          {
+            "text": "Смех на заказ ещё раз",
+            "startTime": 21.400441,
+            "endTime": 25.122305
+          },
+          {
+            "text": "Сон, удалённый тошнотой",
+            "startTime": 25.122305,
+            "endTime": 28.845016
+          },
+          {
+            "text": "Интерферон, зовущий рой",
+            "startTime": 28.845016,
+            "endTime": 32.555334
+          },
+          {
+            "text": "Дырка в клею солдатских жвал",
+            "startTime": 32.555334,
+            "endTime": 36.279653
+          },
+          {
+            "text": "Кости за борт — я завязал",
+            "startTime": 36.279653,
+            "endTime": 40.001625
+          },
+          {
+            "text": "Выбери панк",
+            "startTime": 40.001625,
+            "endTime": 41.850328
+          },
+          {
+            "text": "Выбери джанк",
+            "startTime": 41.850328,
+            "endTime": 43.71046
+          },
+          {
+            "text": "Чёрный укол и осиновый кол",
+            "startTime": 43.71046,
+            "endTime": 47.436538
+          },
+          {
+            "text": "Пей дуракол",
+            "startTime": 47.436538,
+            "endTime": 49.296326
+          },
+          {
+            "text": "Лай и играй",
+            "startTime": 49.296326,
+            "endTime": 51.157027
+          },
+          {
+            "text": "Брюхо вспорол мой парный сай",
+            "startTime": 51.157027,
+            "endTime": 54.869694
+          },
+          {
+            "text": "Сон, удалённый тошнотой",
+            "startTime": 54.869694,
+            "endTime": 58.552484
+          },
+          {
+            "text": "Интерферон, зовущий рой",
+            "startTime": 58.552484,
+            "endTime": 62.280455
+          },
+          {
+            "text": "Дырка в клею солдатских жвал",
+            "startTime": 62.280455,
+            "endTime": 65.989087
+          },
+          {
+            "text": "Кости за борт — я завязал",
+            "startTime": 65.989087,
+            "endTime": 69.202957
+          },
+          {
+            "text": "Сон, удалённый тошнотой",
+            "startTime": 84.325027,
+            "endTime": 88.308846
+          },
+          {
+            "text": "Интерферон, зовущий рой",
+            "startTime": 88.308846,
+            "endTime": 92.022205
+          },
+          {
+            "text": "Дырка в клею солдатских жвал",
+            "startTime": 92.022205,
+            "endTime": 95.747557
+          },
+          {
+            "text": "Кости за борт — я завязал",
+            "startTime": 95.747557,
+            "endTime": 99.20214
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Водянистая влага",
+        "content": "\nЯ с твоим лицом\nЗа твоим лицом\nГод из года ждёт\nТвой невидимый рот\n\nСемь серийных фаз\nСемь серийных фаз\nСеми мёртвых глаз\n\nСемь серийных фаз\nСемь серийных фаз\nСемя мёртвых глаз\n\nСлышит голоса\nОн устал от снов\nЗвон золотой трубы\nСеми городов\n\nСемь серийных фаз\nСемь серийных фаз\nСеми мёртвых глаз\n\nСемь серийных фаз\nСемь серийных фаз\nСемя мёртвых глаз\n\nЯ с твоим лицом\nЗа твоим лицом\nГод из года ждёт\nТвой невидимый рот\n\nТвой рот\nТвой рот\nТвой рот\nТвой рот\nТвой рот\nТвой рот",
+        "src": "/audio/smolyanoechuchelko/02-Watery-moisture-1644.wav"
+      },
+      {
+        "id": 3,
+        "title": "Рулевой мёртв",
+        "content": "\nАкрил, зараза и пот\nСкошенный рот\nО, будь рад\n\nСоздай голый типаж\nСвой персонаж\nО, будь рад\n\nТвой дом —\nОгороженный мрак\nКаменный флаг\nО, будь рад\n\nТы здесь\nЧтобы выпить меня\nСторнируй себя\n\nСад червей\nЧад свиней\nКрестный ход\nВ дымоход\n\nИблис змей\nПост слюной\nС атрицей\nНа покой\n\nБаржа и общий котёл\nЗа ноздрю на прикол\nО, будь рад\n\nМаржа, финансовый вклад\nГербарий и морс\nО, будь рад\n\nПромозгл\nРефлексирующий мозг\nОбезвоженный торс\nО, будь рад\n\nДождись гурий и мёд\nМускусный пот\n\nСад червей\nЧад свиней\nКрестный ход\nВ дымоход\n\nИблис змей\nПост слюной\nС атрицей\nНа покой\n\nМёртв рулевой\nВ дыму баркас \nНе в этот раз\nНе в этот раз\n\nМёртв рулевой\nВ дыму баркас \nНе в этот раз\nНе в этот раз",
+        "src": "/audio/smolyanoechuchelko/03-Helmsman-is-dead-1644.wav"
+      },
+      {
+        "id": 4,
+        "title": "Бром и сталь",
+        "content": "\nСтань безопасным\nШтамп с прозрачной плотью\nЛингам бесполезный\nДруг стальной оскал мой\n\nО, дали бром\nДали пить и дышать мне\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\n\nСдерживай себя\nДо боли в груди\nКожа на руках\nСклеилась от пота\nВри\n\nКаждый без ума\nОт самого себя\nЛипкая рука\nКрутит грязный кусок\nСтали\n\nБромная вода\nХромистая сталь\nЖелезы-глаза \nТратишь понапрасну\n\nАлкил нитриты\nБиение сердца\nМёртвые пятна\nНа моей сетчатке\n\nО, дали бром\nДали пить и дышать мне\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\nБром и сталь\n\nСдерживай себя\nДо боли в груди\nКожа на руках\nСклеилась от пота\nВри\n\nКаждый без ума\nОт самого себя\nЛипкая рука\nКрутит грязный кусок\nСтали\n\nБромная вода\nХромистая сталь\nЖелезы-глаза \nТратишь понапрасну\n\nСтальной\nСтальной\nСтальной\nСтань мной",
+        "src": "/audio/smolyanoechuchelko/04-Bromine-and-steel-1644.wav"
+      },
+      {
+        "id": 5,
+        "title": "Падение кита",
+        "content": "\nЗнак твой сон\nЗнак во взгляде\nВ пеший путь\nДолгий стадий\n\nПьют из ран\nКровь москиты\nВ рот обол\nГлаз закрытый\n\nЯ проснусь\nОбожая каждый день\nЯ, заснув,\nУмираю каждый день\n\nБелый шум\nКлюв беззубый\nВоздух в пресс\nВоздух в губы\n\nРай для всех\nХотя не для всех\nБоль для всех\nПоднять меня на смех\n\nЯ проснусь\nОбожая каждый день\nЯ, заснув,\nУмираю каждый день\n\nЗнак твой сон\nЗнак во взгляде\nВ пеший путь\nДолгий стадий\n\nПьют из ран\nКровь москиты\nВ рот обол\nГлаз закрытый\n\nЯ проснусь\nОбожая каждый день\nЯ, заснув,\nУмираю каждый день",
+        "src": "/audio/smolyanoechuchelko/05-Whale-falling-1644.wav",
+        "syncedLyrics": [
+          {
+            "text": "Знак твой сон",
+            "startTime": 0,
+            "endTime": 2.299312
+          },
+          {
+            "text": "Знак во взгляде",
+            "startTime": 2.299312,
+            "endTime": 4.425891
+          },
+          {
+            "text": "В пеший путь",
+            "startTime": 4.425891,
+            "endTime": 6.542994
+          },
+          {
+            "text": "Долгий стадий",
+            "startTime": 6.542994,
+            "endTime": 8.671303
+          },
+          {
+            "text": "Пьют из ран",
+            "startTime": 8.671303,
+            "endTime": 10.798973
+          },
+          {
+            "text": "Кровь москиты",
+            "startTime": 10.798973,
+            "endTime": 12.924556
+          },
+          {
+            "text": "В рот обол",
+            "startTime": 12.924556,
+            "endTime": 15.051468
+          },
+          {
+            "text": "Глаз закрытый",
+            "startTime": 15.051468,
+            "endTime": 17.166657
+          },
+          {
+            "text": "Я проснусь обожая каждый день",
+            "startTime": 17.166657,
+            "endTime": 25.675519
+          },
+          {
+            "text": "Я, заснув, умираю каждый день",
+            "startTime": 25.675519,
+            "endTime": 35.005203
+          },
+          {
+            "text": "Белый шум",
+            "startTime": 35.005203,
+            "endTime": 37.120057
+          },
+          {
+            "text": "Клюв беззубый",
+            "startTime": 37.120057,
+            "endTime": 39.513299
+          },
+          {
+            "text": "Воздух в пресс",
+            "startTime": 39.513299,
+            "endTime": 41.640824
+          },
+          {
+            "text": "Воздух в губы",
+            "startTime": 41.640824,
+            "endTime": 43.770588
+          },
+          {
+            "text": "Рай для всех",
+            "startTime": 43.770588,
+            "endTime": 45.629609
+          },
+          {
+            "text": "Хотя не для всех",
+            "startTime": 45.629609,
+            "endTime": 48.015602
+          },
+          {
+            "text": "Боль для всех",
+            "startTime": 48.015602,
+            "endTime": 49.872899
+          },
+          {
+            "text": "Поднять меня на смех",
+            "startTime": 49.872899,
+            "endTime": 52.266391
+          },
+          {
+            "text": "Я проснусь обожая каждый день",
+            "startTime": 52.266391,
+            "endTime": 61.032723
+          },
+          {
+            "text": "Я, заснув, умираю каждый день",
+            "startTime": 61.032723,
+            "endTime": 68.627207
+          },
+          {
+            "text": "Знак твой сон",
+            "startTime": 77.73389,
+            "endTime": 80.428296
+          },
+          {
+            "text": "Знак во взгляде",
+            "startTime": 80.428296,
+            "endTime": 82.553424
+          },
+          {
+            "text": "В пеший путь",
+            "startTime": 82.553424,
+            "endTime": 84.674331
+          },
+          {
+            "text": "Долгий стадий",
+            "startTime": 84.674331,
+            "endTime": 87.065056
+          },
+          {
+            "text": "Пьют из ран",
+            "startTime": 87.065056,
+            "endTime": 89.18981
+          },
+          {
+            "text": "Кровь москиты",
+            "startTime": 89.18981,
+            "endTime": 91.316166
+          },
+          {
+            "text": "В рот обол",
+            "startTime": 91.316166,
+            "endTime": 93.433875
+          },
+          {
+            "text": "Глаз закрытый",
+            "startTime": 93.433875,
+            "endTime": 95.560397
+          },
+          {
+            "text": "Я проснусь обожая каждый день",
+            "startTime": 95.560397,
+            "endTime": 104.073044
+          },
+          {
+            "text": "Я, заснув, умираю каждый день",
+            "startTime": 104.073044
+          }
+        ],
+        "authorship": "Ярослав Жук"
+      }
+    ]
+  }
+]

@@ -1,0 +1,105 @@
+@use '../../../scss/abstracts/mixins' as *;
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ms-1);
+  margin: 0 auto;
+  padding: var(--ms-1);
+  color: var(--white);
+
+  &__title {
+    margin: 0;
+    font-size: var(--ms-1);
+    font-weight: 700;
+    text-align: left;
+  }
+
+  &__error {
+    padding: 0.75rem;
+    color: var(--pink-terracotta);
+    font-size: 0.875rem;
+    background: rgb(207 128 125 / 10%);
+    border: 1px solid var(--pink-terracotta);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ms-01);
+  }
+
+  &__label {
+    display: block;
+    color: var(--white);
+    font-size: var(--ms-0);
+    font-weight: 500;
+  }
+
+  &__input {
+    width: 100%;
+    padding: var(--ms-01) var(--ms-01);
+    color: var(--white);
+    font-size: var(--ms-0);
+    background: var(--deep-black);
+    border: 1px solid var(--iron-slate);
+    border-radius: var(--ms-01);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--dark-greenish-yellow);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: var(--warm-concrete);
+    }
+  }
+
+  &__submit {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 600;
+
+    @include button-variant(
+      $color: var(--white),
+      $background: var(--iron-slate),
+      $hover-color: var(--white),
+      $hover-background: var(--graphite-green),
+      $margin: var(--ms-1) 0 0,
+      $padding: var(--ms-01) var(--ms-0),
+      $border: 1px solid var(--iron-slate),
+      $border-radius: var(--ms-01)
+    );
+  }
+
+  &__switch {
+    color: var(--warm-concrete);
+    font-size: 0.875rem;
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  &__link {
+    padding: 0;
+    color: var(--honeydew-melon);
+    font-size: inherit;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 0.25rem;
+
+    &:hover {
+      color: var(--dark-greenish-yellow);
+    }
+  }
+}

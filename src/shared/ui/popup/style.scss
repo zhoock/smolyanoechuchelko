@@ -1,0 +1,134 @@
+// src/components/Popup/style.scss
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+:root {
+  --card-height: 65vh;
+}
+
+/* декларация @property --rotate */
+@property --rotate {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+dialog {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  inline-size: 100vw;
+  block-size: 100dvb;
+  padding: var(--ms-0);
+  overflow: scroll;
+  color: var(--text-color, var(--graphite-green));
+  background: rgb(var(--extra-background-color-rgb, var(--deep-black-rgb)) / 80%);
+  border: none;
+
+  @extend %hide-scrollbar;
+
+  @include breakpoint(tablet) {
+    ppadding: var(--ms-2);
+  }
+
+  // Центрирование только для попапов с классом .popup, но не для дашборда и confirmation-modal
+  &.popup[open]:not(:has(.user-dashboard, .confirmation-modal)) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Размеры контента 600px × 680px применяем ТОЛЬКО для попапов внутри дашборда
+  // Используем селектор, который проверяет наличие .user-dashboard в body
+  body:has(.user-dashboard)
+    &.popup[open]:not(:has(.user-dashboard, .player, .alert-modal, .confirmation-modal)) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Размеры контента 600px × 680px для попапов в дашборде
+    // Применяем только к прямым детям, которые не имеют специфических классов
+    > *:not(
+        .popup__gradient,
+        .user-dashboard,
+        .profile-settings-modal,
+        .cover-image-crop-modal,
+        .alert-modal,
+        .confirmation-modal
+      ) {
+      max-height: 85vh;
+      min-height: 60vh;
+      width: 100%;
+      max-width: 100%;
+
+      // @include breakpoint(tablet) {
+      //   width: 680px;
+      //   max-width: 680px;
+      //   height: 600px;
+      //   min-height: 600px;
+      //   max-height: 600px;
+      // }
+    }
+  }
+
+  // Анимация и эффекты только для попапа с плеером
+  &.popup:has(.player) {
+    backdrop-filter: blur(20px);
+    animation: spin 11.125s linear infinite;
+
+    .popup__gradient {
+      position: absolute;
+      z-index: -1;
+      filter: blur(calc(var(--card-height) / 6));
+      transform: scale(0.7);
+      inline-size: 100%;
+      block-size: 100%;
+      inset-block-start: calc(var(--card-height) / 6);
+    }
+  }
+}
+
+.page:has(dialog[open]) {
+  overflow: hidden;
+
+  @extend %hide-scrollbar;
+}
+
+.hero + dialog[open] {
+  @include breakpoint(desktops) {
+    display: none;
+  }
+}
+
+// Убираем автофокус на range inputs при открытии dialog
+dialog input[type='range']:focus {
+  outline: none;
+}
+
+dialog input[type='range']:focus-visible {
+  outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  dialog :focus {
+    outline: none;
+  }
+
+  dialog :focus-visible {
+    outline: none;
+  }
+}
+
+.about-dialog::backdrop {
+  background: rgb(var(--black-rgb) / 20%);
+  backdrop-filter: blur(8px);
+}

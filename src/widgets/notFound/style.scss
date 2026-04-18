@@ -1,0 +1,28 @@
+// src/components/NotFoundPage/style.scss
+// Импортируем общий файл с зависимостями
+@use '../../scss/abstracts/mixins' as *;
+
+.not-found {
+  display: grid;
+  justify-items: center;
+  place-content: center;
+  min-block-size: 100vh;
+  background: none !important;
+
+  img {
+    inline-size: min(100vi, 1000px);
+    margin: 0;
+
+    @media (height <= 480px) and (orientation: landscape) {
+      inline-size: 425px;
+    }
+  }
+
+  button {
+    @include button-variant($margin: 0 0 var(--ms-1) 0);
+  }
+}
+
+#root:has(.not-found) {
+  display: block;
+}

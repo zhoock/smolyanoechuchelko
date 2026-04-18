@@ -1,0 +1,999 @@
+// src/pages/UserDashboard/components/EditArticleModalV2.style.scss
+@use '@entities/article/ui/style.scss' as *;
+@use '../../../../../scss/abstracts/mixins' as *;
+
+// Общие селекторы img (должны быть перед более специфичными)
+// Селекторы img из вложенных блоков (менее специфичные, чем dialog .edit-article-v2__content.article .uncollapse img)
+.edit-article-v2__image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--ms-01);
+}
+
+.edit-article-v2__carousel-image-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.edit-article-v2__carousel-edit-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+dialog {
+  // Общие стили для всех кнопок в попапе
+  button {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .edit-article-v2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--ms-2);
+    background: transparent;
+
+    &__container {
+      @include dashboard-modal-card($desktop-width: 1000px);
+    }
+
+    &__header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      padding: var(--ms-1) var(--ms-1);
+      background: var(--dashboard-card-bg);
+      border-bottom: 1px solid var(--dashboard-divider);
+      align-items: center;
+      gap: var(--ms-0);
+    }
+
+    &__header-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: var(--ms-0);
+    }
+
+    &__close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(var(--ms-1) * 1.5);
+      height: calc(var(--ms-1) * 1.5);
+      padding: 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-1);
+      font-weight: 300;
+      line-height: 1;
+      background: transparent;
+      border: none;
+      border-radius: var(--ms-02);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+      flex-shrink: 0;
+
+      &:hover {
+        color: var(--dashboard-text-primary);
+        background: var(--dashboard-hover-bg);
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--dark-greenish-yellow);
+        outline-offset: 2px;
+      }
+    }
+
+    &__title-input {
+      padding: var(--ms-01) 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--dashboard-heading-font-size);
+      background: transparent;
+      border: none;
+      flex: 1;
+      outline: none;
+      font-weight: 700;
+      font-family: var(--base-font-family, arial, sans-serif);
+      text-transform: none !important;
+      letter-spacing: normal !important;
+
+      &::placeholder {
+        color: var(--dashboard-text-secondary);
+      }
+    }
+
+    &__status {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      white-space: nowrap;
+    }
+
+    &__footer {
+      @include dashboard-modal-footer($padding: var(--ms-1) var(--ms-2), $margin-top: 0);
+    }
+
+    &__cover-section {
+      padding: var(--ms-1);
+      border-bottom: 1px solid var(--dashboard-divider);
+    }
+
+    &__cover-label {
+      display: block;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 500;
+      margin-bottom: var(--ms-01);
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
+
+    &__cover-file-input {
+      display: none;
+    }
+
+    &__cover-dropzone {
+      position: relative;
+      display: flex;
+      padding: var(--ms-2);
+      background: var(--moon-ash);
+      border: 2px dashed var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      transition: all 0.2s;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      min-height: 120px;
+
+      &:hover {
+        border-color: var(--dark-greenish-yellow);
+        background: var(--dashboard-hover-bg);
+      }
+
+      &--active {
+        border-color: var(--dark-greenish-yellow);
+        background: var(--dashboard-button-primary-bg);
+      }
+    }
+
+    &__cover-dropzone-text {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      text-align: center;
+      margin-bottom: var(--ms-01);
+    }
+
+    &__cover-file-label {
+      cursor: pointer;
+      display: inline-block;
+
+      @include dashboard-button;
+    }
+
+    &__cover-wrap {
+      display: flex;
+      gap: var(--ms-1);
+      align-items: flex-start;
+    }
+
+    &__cover-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 160px;
+      aspect-ratio: 1 / 1;
+      background: var(--dashboard-hover-bg);
+      border-radius: var(--ms-01);
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgb(var(--black-rgb) / 10%);
+      flex-shrink: 0;
+    }
+
+    &__cover-image {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      margin-bottom: 0;
+    }
+
+    &__cover-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ms-01);
+      flex: 1;
+    }
+
+    &__cover-buttons {
+      display: flex;
+      gap: var(--ms-01);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    &__cover-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      @include dashboard-button;
+    }
+
+    &__cover-status {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ms-01);
+      margin-top: var(--ms-01);
+    }
+
+    &__cover-progress {
+      width: 100%;
+      height: 4px;
+      background: var(--dashboard-hover-bg);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    &__cover-progress-bar {
+      height: 100%;
+      background: var(--dark-greenish-yellow);
+      transition: width 0.3s ease;
+    }
+
+    &__cover-status-text {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-01);
+      line-height: 1.4;
+
+      &--success {
+        color: var(--dark-greenish-yellow);
+      }
+
+      &--error {
+        color: rgb(220 38 38);
+      }
+    }
+
+    &__button {
+      &--cancel,
+      &--publish {
+        @include dashboard-button;
+
+        &--publish:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    &__content {
+      flex: 1 1 0;
+      overflow-y: auto;
+      padding: var(--ms-2);
+      min-height: 0;
+    }
+
+    &__blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    // Используем реальные стили статьи из HelpArticle (скопированы из help-article__body)
+    &__content.article {
+      color: var(--text-color, var(--dashboard-text-primary));
+      font-size: 1rem;
+      font-family: var(--base-font-family, arial, sans-serif);
+      line-height: 1.6;
+
+      strong {
+        font-weight: bold;
+      }
+
+      p {
+        margin: 0 0 var(--ms-2);
+        color: var(--text-color, var(--dashboard-text-primary));
+
+        &:last-child {
+          margin-block-end: 0;
+        }
+
+        strong {
+          font-weight: 700;
+          color: var(--text-color, var(--dashboard-text-primary));
+        }
+      }
+
+      ul {
+        margin: 0 0 var(--ms-2);
+        list-style-type: disc;
+
+        &:last-child {
+          margin-block-end: 0;
+        }
+
+        li {
+          margin: 0 0 var(--ms-01);
+          color: var(--text-color, var(--dashboard-text-primary));
+
+          &:last-child {
+            margin-block-end: 0;
+          }
+        }
+      }
+
+      .uncollapse {
+        img {
+          max-inline-size: 100%;
+          block-size: auto;
+          display: block;
+        }
+      }
+    }
+
+    &__drag-handle {
+      position: absolute;
+      top: var(--ms-01);
+      left: calc(var(--ms-0) * -2);
+      z-index: 10;
+      display: flex;
+      width: calc(var(--ms-0) * 1.5);
+      height: calc(var(--ms-0) * 1.5);
+      background: var(--dashboard-hover-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-02);
+      transition:
+        opacity 0.2s,
+        color 0.2s,
+        background-color 0.2s,
+        border-color 0.2s;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      opacity: 0;
+      flex-shrink: 0;
+
+      &:active {
+        cursor: grabbing;
+      }
+
+      &:hover {
+        background: var(--dashboard-button-primary-bg);
+        border-color: var(--dark-greenish-yellow);
+      }
+    }
+
+    &__block-wrapper {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      padding: var(--ms-01);
+      border-radius: var(--ms-01);
+      transition: background-color 0.2s;
+
+      &.is-focused {
+        background: var(--dashboard-hover-bg);
+      }
+
+      &.is-dragging {
+        opacity: 0.5;
+      }
+
+      &--selected {
+        outline: 2px solid var(--dark-greenish-yellow);
+        outline-offset: 2px;
+        border-radius: var(--ms-01);
+      }
+
+      &:hover .edit-article-v2__drag-handle,
+      &.is-focused .edit-article-v2__drag-handle {
+        opacity: 0.8;
+      }
+
+      &:hover .edit-article-v2__drag-handle:hover,
+      &.is-focused .edit-article-v2__drag-handle:hover {
+        opacity: 1;
+      }
+    }
+
+    &__drag-handle-icon {
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    &__drag-handle:hover &__drag-handle-icon {
+      color: var(--dashboard-text-primary);
+    }
+
+    &__block-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    // VK-стиль плюса (показывается только после Enter в конце блока)
+    &__vk-plus {
+      position: absolute;
+      top: 50%;
+      left: -40px;
+      z-index: 10;
+      display: flex;
+      transform: translateY(-50%);
+      align-items: center;
+    }
+
+    &__vk-plus-button {
+      display: flex;
+      width: calc(var(--ms-0) * 1.5);
+      height: calc(var(--ms-0) * 1.5);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      line-height: 1;
+      background: var(--dashboard-hover-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: 50%;
+      transition: all 0.2s;
+      font-weight: 300;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: var(--dashboard-text-primary);
+        background: var(--dashboard-button-primary-bg);
+        border-color: var(--dark-greenish-yellow);
+      }
+    }
+
+    &__vk-plus-menu {
+      position: absolute;
+      top: calc(var(--ms-0) * 1.5);
+      left: 0;
+      z-index: 1000;
+      padding: var(--ms-01) 0;
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      box-shadow: 0 4px 12px var(--dashboard-shadow);
+      min-width: 200px;
+      margin-top: var(--ms-02);
+    }
+
+    &__vk-plus-menu-item {
+      display: flex;
+      width: 100%;
+      padding: var(--ms-01) var(--ms-0);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      text-align: left;
+      background: transparent;
+      border: none;
+      transition: background-color 0.2s;
+      cursor: pointer;
+      align-items: center;
+      gap: var(--ms-01);
+
+      &:hover {
+        background: var(--dashboard-hover-bg);
+      }
+    }
+
+    &__vk-plus-menu-icon {
+      width: calc(var(--ms-0) * 1.2);
+      font-size: var(--ms-0);
+      text-align: center;
+    }
+
+    &__block {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      font-family: inherit;
+      font-weight: inherit;
+      min-height: 1.5em;
+
+      &--paragraph {
+        // Стили наследуются от p в &__content.article
+      }
+
+      &--title {
+        // Стили наследуются от h3 в &__content.article
+      }
+
+      &--subtitle {
+        // Стили наследуются от h4 в &__content.article
+      }
+
+      &--quote {
+        padding-left: var(--ms-0);
+        border-left: 3px solid var(--dashboard-card-border);
+        font-style: italic;
+      }
+
+      &--list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      &--list-item {
+        // Стили наследуются от ul li в &__content.article
+      }
+
+      &--divider {
+        padding: var(--ms-0) 0;
+
+        hr {
+          margin: 0;
+          border: none;
+          border-top: 1px solid var(--dashboard-divider);
+        }
+      }
+
+      &--image,
+      &--carousel {
+        padding: 16px 0;
+      }
+    }
+
+    &__list-bullet {
+      color: var(--dashboard-text-secondary);
+      margin-top: var(--ms-02);
+      flex-shrink: 0;
+    }
+
+    &__image-container {
+      position: relative;
+      margin-bottom: var(--ms-01);
+      cursor: pointer;
+
+      // Стили img определены выше для соблюдения специфичности
+    }
+
+    &__image-upload {
+      @include dashboard-button;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    &__image-convert-to-carousel {
+      position: absolute;
+      top: var(--ms-01);
+      right: var(--ms-01);
+      z-index: 10;
+      font-size: var(--ms-01);
+      opacity: 0.9;
+      transition: opacity 0.2s;
+
+      @include dashboard-button($padding: var(--ms-01) var(--ms-0));
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    &__image-caption {
+      width: 100%;
+      padding: var(--ms-01);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      margin-top: var(--ms-01);
+
+      &::placeholder {
+        color: var(--dashboard-text-secondary);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--dark-greenish-yellow);
+      }
+    }
+
+    // VK-стиль карусели: показываем только первое изображение с навигацией
+    &__carousel-view {
+      position: relative;
+      width: 100%;
+    }
+
+    &__carousel-image-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: var(--ms-01);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    // Контейнер для кнопки редактирования и бейджа в правом верхнем углу
+    &__carousel-top-right {
+      position: absolute;
+      top: var(--ms-01);
+      right: var(--ms-01);
+      z-index: 3;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--ms-01);
+    }
+
+    // Бейдж "1 из N"
+    &__carousel-badge {
+      padding: var(--ms-02) var(--ms-01);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-01);
+      background: rgb(var(--white-rgb) / 90%);
+      border-radius: var(--ms-02);
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    // Стрелки навигации
+    &__carousel-nav {
+      position: absolute;
+      top: 50%;
+      z-index: 3;
+      display: flex;
+      width: 40px;
+      height: 40px;
+      color: var(--dashboard-text-primary);
+      font-size: 24px;
+      line-height: 1;
+      background: rgb(var(--white-rgb) / 80%);
+      border: none;
+      border-radius: 50%;
+      transition:
+        background 0.2s,
+        opacity 0.2s;
+      transform: translateY(-50%);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        background: rgb(var(--white-rgb) / 95%);
+      }
+
+      &--prev {
+        left: var(--ms-01);
+      }
+
+      &--next {
+        right: var(--ms-01);
+      }
+    }
+
+    // Кнопка "Редактировать карусель"
+    &__carousel-edit {
+      padding: var(--ms-01) var(--ms-0);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-01);
+      background: rgb(var(--white-rgb) / 90%);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      transition:
+        background 0.2s,
+        border-color 0.2s;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      white-space: nowrap;
+
+      &:hover {
+        background: var(--dashboard-button-primary-bg);
+        border-color: var(--mango-sorbet);
+      }
+    }
+
+    // Пустая карусель
+    &__carousel-empty {
+      padding: var(--ms-02);
+      text-align: center;
+    }
+
+    &__carousel-add-empty {
+      @include dashboard-button;
+    }
+
+    // Подпись к карусели (отображение)
+    &__carousel-caption-display {
+      padding: var(--ms-01);
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      line-height: 1.5;
+      margin-top: var(--ms-01);
+    }
+
+    &__block-wrapper-text {
+      position: relative;
+    }
+
+    &__format-menu {
+      position: fixed;
+      z-index: 1000;
+      display: flex;
+      padding: var(--ms-02);
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      box-shadow: 0 4px 12px var(--dashboard-shadow);
+      gap: var(--ms-02);
+      pointer-events: auto;
+    }
+
+    &__format-menu-item {
+      display: flex;
+      width: calc(var(--ms-0) * 1.5);
+      height: calc(var(--ms-0) * 1.5);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      background: transparent;
+      border: none;
+      border-radius: var(--ms-01);
+      transition: background-color 0.2s;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: var(--dashboard-hover-bg);
+      }
+
+      em {
+        font-style: italic;
+      }
+    }
+
+    &__slash-menu {
+      z-index: 1000;
+      padding: var(--ms-01) 0;
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      box-shadow: 0 4px 12px var(--dashboard-shadow);
+      min-width: 250px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    &__slash-menu-title {
+      padding: var(--ms-01) var(--ms-0);
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-01);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--dashboard-divider);
+      margin-bottom: var(--ms-02);
+    }
+
+    &__slash-menu-item {
+      display: flex;
+      width: 100%;
+      padding: var(--ms-01) var(--ms-0);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      text-align: left;
+      background: transparent;
+      border: none;
+      transition: background-color 0.2s;
+      cursor: pointer;
+      align-items: center;
+      gap: var(--ms-01);
+
+      &:hover,
+      &.is-selected {
+        background: var(--dashboard-hover-bg);
+      }
+
+      &.is-selected {
+        background: var(--dashboard-button-primary-bg);
+      }
+    }
+
+    &__slash-menu-icon {
+      width: calc(var(--ms-0) * 1.2);
+      font-size: var(--ms-0);
+      text-align: center;
+    }
+
+    // Модал редактирования карусели
+    &__carousel-edit-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: flex;
+      width: 90vw;
+      max-width: 800px;
+      max-height: 90vh;
+      flex-direction: column;
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+    }
+
+    &__carousel-edit-header {
+      display: flex;
+      padding: var(--ms-0);
+      border-bottom: 1px solid var(--dashboard-divider);
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ms-0);
+    }
+
+    &__carousel-edit-title {
+      margin: 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 600;
+    }
+
+    &__carousel-edit-count {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-01);
+      margin-left: auto;
+    }
+
+    &__carousel-edit-actions {
+      display: flex;
+      gap: var(--ms-01);
+    }
+
+    &__carousel-edit-cancel,
+    &__carousel-edit-save {
+      padding: var(--ms-01) var(--ms-0);
+      font-size: var(--ms-01);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    &__carousel-edit-cancel {
+      color: var(--dashboard-text-secondary);
+      background: transparent;
+
+      &:hover {
+        color: var(--dashboard-text-primary);
+        background: var(--dashboard-hover-bg);
+      }
+    }
+
+    &__carousel-edit-save {
+      color: var(--dashboard-text-primary);
+      background: var(--dashboard-button-primary-bg);
+      border-color: var(--mango-sorbet);
+
+      &:hover {
+        background: var(--honeydew-melon);
+        border-color: var(--honeydew-melon);
+      }
+    }
+
+    &__carousel-edit-content {
+      padding: var(--ms-0);
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    &__carousel-edit-thumbnails {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--ms-01);
+      margin-bottom: var(--ms-0);
+    }
+
+    &__carousel-edit-thumbnail {
+      position: relative;
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      aspect-ratio: 1;
+      overflow: hidden;
+
+      img {
+        // Стили определены выше для соблюдения специфичности
+      }
+    }
+
+    &__carousel-edit-remove {
+      position: absolute;
+      top: var(--ms-02);
+      right: var(--ms-02);
+      display: flex;
+      width: 24px;
+      height: 24px;
+      color: var(--dashboard-text-primary);
+      font-size: 18px;
+      line-height: 1;
+      background: rgb(220 38 38 / 80%);
+      border: none;
+      border-radius: 50%;
+      transition: background 0.2s;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        background: rgb(220 38 38 / 100%);
+      }
+    }
+
+    &__carousel-edit-add {
+      display: flex;
+      color: var(--dashboard-text-secondary);
+      font-size: 32px;
+      line-height: 1;
+      background: transparent;
+      border: 2px dashed var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+      transition: all 0.2s;
+      aspect-ratio: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:hover:not(:disabled) {
+        border-color: var(--dark-greenish-yellow);
+        color: var(--dark-greenish-yellow);
+        background: var(--dashboard-hover-bg);
+      }
+    }
+
+    &__carousel-edit-caption-input {
+      width: 100%;
+      padding: var(--ms-01);
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-01);
+
+      &::placeholder {
+        color: var(--dashboard-text-secondary);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--dark-greenish-yellow);
+      }
+    }
+  }
+}
+
+// Overlay для модалки поверх модалки
+dialog dialog::backdrop {
+  background: var(--dashboard-backdrop);
+  backdrop-filter: blur(4px);
+}

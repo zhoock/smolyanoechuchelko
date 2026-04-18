@@ -1,0 +1,21 @@
+// tsconfig.eslint.json
+
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["jest", "node", "@testing-library/jest-dom"]
+  },
+  "include": [
+    "src",
+    "src/test-setup.d.ts",
+    "jest.setup.ts",
+    "webpack/**/*.js",
+    "postcss.config.js",
+    "eslint.config.mjs",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "__tests__/**/*"
+  ]
+}

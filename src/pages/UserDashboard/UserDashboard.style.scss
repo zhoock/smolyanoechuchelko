@@ -1,0 +1,72 @@
+/* Dashboard */
+
+@use '../../scss/abstracts/mixins' as *;
+
+// Импортируем модульные стили
+@use 'styles/layout';
+@use 'styles/content';
+@use 'styles/tracks';
+@use 'styles/purchases';
+@use 'styles/modals';
+
+dialog {
+  color: var(--dashboard-text-primary);
+  background: var(--dashboard-card-bg);
+
+  // Общие стили для всех кнопок в дашборде и попапах
+  button {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .user-dashboard {
+    display: flex;
+    font-size: var(--dashboard-font-size);
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    line-height: 1.2;
+
+    // Main card - светлая карточка
+    &__card {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+      min-height: auto;
+      max-height: 100vh;
+      overflow: hidden;
+      background: var(--dashboard-card-bg);
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: 0;
+      box-shadow: 0 8px 32px var(--dashboard-shadow);
+
+      @include breakpoint(tablet) {
+        max-width: 1000px;
+        min-height: 600px;
+        max-height: 90vh;
+        border-radius: var(--ms-0);
+      }
+    }
+
+    // Body with sidebar and content
+    &__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+
+      @include breakpoint(tablet) {
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+// Стили для backdrop (фон за попапом)
+dialog::backdrop {
+  background: var(--dashboard-backdrop);
+  backdrop-filter: blur(8px);
+}

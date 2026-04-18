@@ -1,0 +1,65 @@
+// tsconfig.json
+// Этот файл конфигурации TypeScript настроен для работы с React, Webpack и современными возможностями JavaScript.
+
+{
+  "compilerOptions": {
+    "target": "ESNext", // Целевая версия ECMAScript — максимально современная
+    "module": "ESNext", // Модульная система — пусть Webpack работает с ES-модулями
+    "moduleResolution": "node", // Разрешение модулей в стиле Node.js
+    "lib": ["DOM", "ESNext"], // Доступные библиотеки
+    "jsx": "react-jsx", // JSX-компиляция в стиле React 17+
+    "strict": true, // Строгие типы
+    "esModuleInterop": true, // Совместимость с CommonJS
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true, // Разрешить .js
+    "resolveJsonModule": true, // Импорт JSON
+    "isolatedModules": true, // Каждый файл — модуль
+    "skipLibCheck": true, // Пропускать проверку d.ts в node_modules
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./src", // База для неотносительных путей
+    "paths": {
+      "@/*": ["*"],
+      "@pages/*": ["pages/*"],
+      "@shared/*": ["shared/*"],
+      "@entities/*": ["entities/*"],
+      "@features/*": ["features/*"],
+      "@widgets/*": ["widgets/*"],
+      "@app/*": ["app/*"],
+      "@routes/*": ["routes/*"],
+      "@audio/*": ["audio/*"],
+      "@models": ["models"],
+      "@models/*": ["models/*"],
+      "@config": ["config"],
+      "@config/*": ["config/*"]
+    },
+
+    // 🔽 ДОБАВЛЕНО: типы для глобального API Jest и Node
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+    "typeRoots": ["./node_modules/@types", "./src"]
+    // "experimentalDecorators": true,
+    // "emitDecoratorMetadata": true
+  },
+
+  // 🔽 ДОБАВЛЕНО: чтобы тесты и setup точно попали в проект TS
+  "include": [
+    "src",
+    "src/custom.d.ts",
+    "index.d.ts",
+    "jest.setup.ts",
+    "src/test-setup.d.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "webpack/webpack.common.js",
+    "postcss.config.js",
+    "eslint.config.mjs",
+    "coverage"
+  ]
+}

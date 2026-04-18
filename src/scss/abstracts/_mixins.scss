@@ -1,0 +1,547 @@
+// src/scss/abstracts/_mixins.scss
+
+// Преобразуем CSS-переменные в SCSS-переменные
+$ms-02: 6.876px; // 0.382rem;
+$ms-01: 11.125px; // 0.618rem;
+$ms-0: 18px; // 1rem;
+$ms-1: 29.124px; // 1.618rem;
+$ms-2: 47.123px; // 2.618rem;
+$ms-3: 76.244px; // 4.236rem;
+$ms-4: 123.363px; // 6.854rem;
+
+@use 'sass:math';
+@use 'sass:color';
+
+// Button
+
+@mixin button-variant(
+  $color: var(--button-color, #dddddd),
+  $background: var(--button-background-color, #373633),
+  $hover-color: var(--button-color-hover, #ffffff),
+  $hover-background: var(--button-background-color-hover, #998238),
+  $margin: var(--ms-1) 0,
+  $padding: var(--ms-01) var(--ms-0),
+  $border: 0,
+  $border-radius: var(--ms-01),
+  $disabled-background: var(--button-disabled-background, #9b9b9a)
+) {
+  margin: $margin;
+  padding: $padding;
+  color: $color;
+  background: $background;
+  border: $border;
+  border-radius: $border-radius;
+  transition: all 200ms ease;
+  cursor: pointer;
+  appearance: none;
+  user-select: none;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: $hover-color;
+      background-color: $hover-background;
+    }
+  }
+
+  &:active {
+    color: $hover-color;
+    background-color: $hover-background;
+    scale: 0.98;
+  }
+
+  &.disabled,
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $disabled-background;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Dashboard button - единый темный стиль для всех кнопок в админке
+@mixin dashboard-button(
+  $margin: 0,
+  $padding: var(--ms-01) var(--ms-0),
+  $border-radius: var(--ms-01)
+) {
+  font-size: var(--dashboard-font-size);
+  line-height: 16px;
+
+  @include button-variant(
+    $color: var(--dashboard-button-cancel-text),
+    $background: var(--dashboard-button-cancel-bg),
+    $hover-color: var(--dashboard-button-cancel-text),
+    $hover-background: var(--dashboard-button-cancel-hover),
+    $margin: $margin,
+    $padding: $padding,
+    $border: 0,
+    $border-radius: $border-radius
+  );
+}
+
+// Dashboard delete button - стиль для кнопок удаления
+@mixin dashboard-delete-button(
+  $margin: 0,
+  $padding: var(--ms-01) var(--ms-0),
+  $border-radius: var(--ms-01)
+) {
+  display: flex;
+  margin: $margin;
+  padding: $padding;
+  color: var(--dashboard-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  background: rgb(139 69 19 / 30%); // Темно-коричневый фон
+  border: 1px solid rgb(220 38 38 / 50%); // Красная граница
+  border-radius: $border-radius;
+  transition: all 0.2s;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  text-transform: none;
+  letter-spacing: normal;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--dashboard-text-primary);
+      background: rgb(220 38 38 / 30%);
+      border-color: rgb(220 38 38 / 70%);
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    background: rgb(220 38 38 / 30%);
+    border-color: rgb(220 38 38 / 70%);
+  }
+
+  &.disabled,
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+// Dashboard modal card - единый стиль для всех попапов
+@mixin dashboard-modal-card(
+  $mobile-max-height: 90vh,
+  $desktop-width: 680px,
+  $desktop-height: 600px
+) {
+  // Базовые стили
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 60vh;
+  max-height: $mobile-max-height;
+  background: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  border-radius: var(--ms-0);
+  box-shadow: 0 8px 32px var(--dashboard-shadow);
+
+  // Десктоп стили
+  @include breakpoint(tablet) {
+    width: $desktop-width;
+    max-width: $desktop-width;
+    height: $desktop-height;
+    min-height: $desktop-height;
+    max-height: $desktop-height;
+  }
+}
+
+// Dashboard font size - базовый размер шрифта для дашборда
+@mixin dashboard-font-size {
+  font-size: var(--dashboard-font-size);
+}
+
+// Dashboard heading font size - размер шрифта для заголовков
+@mixin dashboard-heading-font-size {
+  font-size: var(--dashboard-heading-font-size);
+}
+
+// Dashboard form field - контейнер для поля формы (стиль ChatGPT)
+@mixin dashboard-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+// Dashboard form label - метка поля формы (стиль ChatGPT)
+@mixin dashboard-form-label {
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-font-size);
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 4px;
+}
+
+// Dashboard form input - текстовое поле (стиль ChatGPT)
+@mixin dashboard-form-input($padding: 12px 16px) {
+  display: block;
+  width: 100%;
+  padding: $padding;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-font-size);
+  font-family: inherit;
+  line-height: 1.5;
+  background: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: var(--dashboard-text-secondary);
+    opacity: 0.7;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--dark-greenish-yellow);
+    box-shadow: 0 0 0 3px rgba(var(--dark-greenish-yellow-rgb, 250 229 155) / 10%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--dashboard-hover-bg);
+  }
+}
+
+// Dashboard form textarea - многострочное поле (стиль ChatGPT)
+@mixin dashboard-form-textarea($padding: 12px 16px, $min-height: 120px) {
+  display: block;
+  width: 100%;
+  min-height: $min-height;
+  padding: $padding;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-font-size);
+  line-height: 1.5;
+  font-family: inherit;
+  background: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+  resize: vertical;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: var(--dashboard-text-secondary);
+    opacity: 0.7;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--dark-greenish-yellow);
+    box-shadow: 0 0 0 3px rgba(var(--dark-greenish-yellow-rgb, 250 229 155) / 10%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--dashboard-hover-bg);
+  }
+}
+
+// Dashboard form select - выпадающий список (стиль ChatGPT)
+@mixin dashboard-form-select($padding: 12px 16px) {
+  display: block;
+  width: 100%;
+  padding: $padding;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-font-size);
+  font-family: inherit;
+  line-height: 1.5;
+  background: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: var(--dark-greenish-yellow);
+    box-shadow: 0 0 0 3px rgba(var(--dark-greenish-yellow-rgb, 250 229 155) / 10%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--dashboard-hover-bg);
+  }
+}
+
+@mixin dashboard-modal-footer(
+  $padding: var(--ms-01),
+  $border-color: var(--dashboard-divider),
+  $margin-top: auto
+) {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ms-0);
+  padding: $padding;
+  margin-top: $margin-top;
+  border-top: 1px solid $border-color;
+  background: var(--dashboard-card-bg);
+}
+
+$old-phones: 'width < 375px';
+$phones: 'width >= 375px';
+$tablets: 'width >= 768px';
+$desktops: 'width >= 1024px';
+
+@mixin breakpoint($point) {
+  /* Для очень маленьких экранов (старые телефоны, узкие экраны) */
+
+  @if $point == old-phones {
+    @media ($old-phones) {
+      @content;
+    }
+  }
+
+  // Для современных телефонов
+
+  @if $point == phones {
+    @media ($phones) {
+      @content;
+    }
+  }
+
+  // Для планшетов (iPad Mini, Galaxy Tab)
+
+  @if $point == tablet {
+    @media ($tablets) {
+      @content;
+    }
+  }
+
+  // Для ноутбуков и десктопов
+
+  @if $point == desktops {
+    @media ($desktops) {
+      @content;
+    }
+  }
+}
+
+// link
+
+@mixin link-colors($normal: false, $hover: false, $active: false, $visited: false, $focus: false) {
+  color: var(#{$normal});
+
+  @if $hover {
+    &:hover {
+      color: var(#{$hover});
+    }
+  }
+
+  @if $active {
+    &.active,
+    &:active {
+      color: var(#{$active});
+    }
+  }
+
+  @if $visited {
+    &:visited {
+      color: var(#{$visited});
+    }
+  }
+
+  @if $focus {
+    &:focus {
+      color: var(#{$focus});
+    }
+  }
+}
+
+// https://designmodo.com/vertical-rhythm/
+
+// Функция для настройки размера шрифта с учетом базовой линии
+// $to-font-size - целевой размер шрифта
+// $scale-value - множитель масштаба (по умолчанию 1)
+// $base-line-height - базовая высота строки (по умолчанию 18px * 1.618)
+// $base-font-size - базовый размер шрифта (по умолчанию 18px)
+// пример использования: adjust-font-size-to($ms-0, 0.382, 18px);
+
+@mixin adjust-font-size-to(
+  $to-font-size,
+  $scale-value: 1,
+  $base-line-height: calc(18px * 1.618),
+  $base-font-size: 18px
+) {
+  margin-block: math.div($base-line-height * $scale-value, $to-font-size) + em;
+  font-size: math.div($to-font-size, $base-font-size) + rem;
+  line-height: math.div($base-line-height * 1.618, $to-font-size);
+}
+
+// List
+
+@mixin list($block) {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--ms-0);
+  margin: 0 calc(-1 * var(--ms-1)) var(--ms-1);
+  padding: 0 var(--ms-1);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+
+  @extend %hide-scrollbar;
+
+  @include breakpoint(tablet) {
+    display: grid;
+    gap: $ms-1;
+    margin: 0 0 var(--ms-1);
+    padding: 0;
+    grid-template: minmax(323px, auto) / repeat(auto-fit, minmax(calc(1 / 4 * 1000px), 1fr));
+
+    &:has(:hover) #{$block}__card:not(:hover) {
+      opacity: 0.5;
+    }
+  }
+
+  @include breakpoint(desktops) {
+    grid-template-columns: repeat(auto-fill, minmax(calc(1 / 4 * 1000px), 1fr));
+  }
+}
+
+%hide-scrollbar {
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+%filter {
+  background: rgba(var(--extra-background-color), 0.8);
+  backdrop-filter: blur(20px);
+}
+
+%card {
+  flex: none;
+  inline-size: 100%;
+  transition: all 200ms ease;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+
+  a {
+    display: block;
+    text-decoration: none;
+    color: var(--link-subtitle-color, #dddddd);
+
+    &:focus-visible {
+      // позволит визуально выделить элемент за пределами его границ, даже если он обрезан.
+      outline-offset: -4px; /* Смещение от границы элемента */
+    }
+
+    img {
+      margin-block-end: 0;
+    }
+  }
+}
+
+%description {
+  margin-block-start: var(--ms-01);
+}
+
+// Миксин для светлой темы - убирает дублирование между html.theme-light и @media (prefers-color-scheme: light)
+@mixin light-theme-variables {
+  --main-background-color: var(--white);
+  --extra-background-color: var(--moon-ash);
+  --extra-background-color-rgb: var(--moon-ash-rgb);
+  --nested-background-color: var(--white);
+  --nested-background-text-color: var(--graphite-green);
+  --theme-toggler-color: var(--graphite-green);
+  --text-color: var(--graphite-green);
+  --time-color: var(--quiet-gray);
+  --link-color: var(--honeydew-melon);
+  --link-color-hover: var(--charcoal);
+  --links-header-color: var(--graphite-green);
+  --links-header-color-hover: var(--charcoal);
+  --links-header-color-active: var(--charcoal);
+  --button-lang-menu-color: var(--graphite-green);
+  --button-lang-menu-color-hover: var(--charcoal);
+  --link-hamburger-color: var(--graphite-green);
+  --link-hamburger-color-hover: var(--charcoal);
+  --link-hamburger-color-active: var(--charcoal);
+  --link-subtitle-color: var(--graphite-green);
+  --link-button-color: var(--graphite-green);
+  --link-button-background-color: var(--icy-mist);
+  --link-button-background-color-hover: var(--mango-sorbet);
+  --button-color: var(--graphite-green);
+  --button-color-hover: var(--charcoal);
+  --button-background-color: var(--icy-mist);
+  --button-background-color-hover: var(--mango-sorbet);
+  --button-disabled-background: var(--warm-concrete);
+  --social-networks-background-color: var(--charcoal);
+  --accent-color: var(--mango-sorbet);
+  --error-color: var(--pink-terracotta);
+  --outline-color: #f3d69f;
+  --selection-color: #fbeac4;
+  --hr-color: var(--icy-mist);
+  --wave-bg: rgb(var(--moon-ash-rgb, 231 231 230) / 70%);
+  --wave-progress-fill: rgb(var(--mango-sorbet-rgb, 250 229 155) / 16%);
+  --wave-cursor-color: rgb(var(--mango-sorbet-rgb, 250 229 155) / 90%);
+  --wave-bars: rgb(var(--charcoal-rgb, 39 39 39) / 42%);
+  --wave-bars-active: rgb(var(--mango-sorbet-rgb, 250 229 155) / 78%);
+  --mini-player-background: var(--white-color-rgb, 255 255 255);
+  --mini-player-text: var(--black, #000000);
+  --mini-player-button: var(--black, #000000);
+
+  // Скелетон
+  --skeleton-base-rgb: var(--charcoal-rgb, 39 39 39);
+  --skeleton-play-button-rgb: var(--mango-sorbet-rgb, 250 229 155);
+  --skeleton-progress-rgb: var(--charcoal-rgb, 39 39 39);
+
+  // Dashboard (Админка) - светлая тема
+  --dashboard-card-bg: var(--white);
+  --dashboard-card-border: var(--icy-mist);
+  --dashboard-text-primary: var(--graphite-green);
+  --dashboard-text-secondary: var(--quiet-gray);
+  --dashboard-input-bg: var(--white);
+  --dashboard-input-border: var(--icy-mist);
+  --dashboard-button-bg: var(--icy-mist);
+  --dashboard-button-bg-hover: var(--mango-sorbet);
+  --dashboard-button-text: var(--graphite-green);
+  --dashboard-button-cancel-bg: var(--icy-mist);
+  --dashboard-button-cancel-text: var(--graphite-green);
+  --dashboard-button-cancel-hover: var(--mango-sorbet);
+  --dashboard-button-save-bg: var(--mango-sorbet);
+  --dashboard-button-save-text: var(--graphite-green);
+  --dashboard-button-save-hover: var(--honeydew-melon);
+  --dashboard-button-primary-bg: var(--mango-sorbet);
+  --dashboard-button-primary-bg-hover: var(--honeydew-melon);
+  --dashboard-button-primary-text: var(--graphite-green);
+  --dashboard-divider: var(--icy-mist);
+  --dashboard-hover-bg: var(--icy-mist);
+  --dashboard-active-bg: var(--mango-sorbet);
+  --dashboard-shadow: rgb(var(--black-rgb) / 10%);
+  --dashboard-backdrop: rgb(var(--black-rgb) / 20%);
+}

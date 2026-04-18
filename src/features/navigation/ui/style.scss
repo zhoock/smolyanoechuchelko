@@ -1,0 +1,64 @@
+// src/features/navigation/ui/style.scss
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+.header {
+  &__menu {
+    display: none;
+
+    @include breakpoint(desktops) {
+      display: block;
+    }
+  }
+
+  &__links-list {
+    display: flex;
+    gap: var(--ms-0);
+    margin-block-end: 0;
+
+    .header__link {
+      text-decoration: none;
+      text-transform: capitalize;
+      color: var(--links-header-color, #dddddd);
+      font-weight: var(--bold, 700);
+
+      @include link-colors(
+        --links-header-color,
+        --links-header-color-hover,
+        --links-header-color-active
+      );
+
+      &.pending {
+        opacity: 0.5;
+        pointer-events: none; // чтобы не кликали повторно
+      }
+    }
+  }
+}
+
+dialog {
+  .header {
+    &__menu {
+      inline-size: 100%;
+      block-size: 100%;
+      display: block;
+    }
+
+    &__links-list {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      font-family: 'Oswald', sans-serif;
+
+      .header__link {
+        display: block;
+        text-decoration: none;
+
+        @include adjust-font-size-to($ms-1, 0);
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+@use '../../../scss/abstracts/mixins' as *;
+
+// ============================================================================
+// Общие стили для всех скелетонов
+// ============================================================================
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--skeleton-base-rgb, 255 255 255) / 10%) 0%,
+    rgb(var(--skeleton-base-rgb, 255 255 255) / 20%) 50%,
+    rgb(var(--skeleton-base-rgb, 255 255 255) / 10%) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--ms-01);
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+
+  // Общие текстовые элементы (используются в AlbumsSkeleton и ArticlesSkeleton)
+  &--text {
+    block-size: 1em;
+    border-radius: var(--ms-01);
+  }
+
+  &--title {
+    inline-size: 80%;
+    margin-block-end: var(--ms-02);
+  }
+}
+
+// ============================================================================
+// Анимация shimmer для всех скелетонов
+// ============================================================================
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}

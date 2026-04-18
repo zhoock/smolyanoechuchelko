@@ -1,0 +1,172 @@
+@use '../../../scss/abstracts/mixins' as *;
+
+.image-carousel {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.image-carousel__container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  @extend %hide-scrollbar;
+}
+
+.image-carousel__slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+
+  img {
+    display: block;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+.image-carousel__button {
+  display: none;
+
+  @include breakpoint(tablet) {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--ms-2);
+    height: var(--ms-2);
+    transition: opacity 0.3s ease;
+    transform: translateY(-50%) scale(1);
+    opacity: 0;
+    backdrop-filter: blur(4px);
+
+    @include button-variant(
+      $color: var(--white, #ffffff),
+      $hover-color: var(--white, #ffffff),
+      $background: rgb(var(--black-rgb) / 60%),
+      $hover-background: rgb(var(--black-rgb) / 80%),
+      $margin: 0,
+      $padding: 0,
+      $border-radius: 50%
+    );
+
+    &:active {
+      background-color: rgb(var(--black-rgb) / 90%);
+      transform: translateY(-50%) scale(0.85);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-50%) scale(1.05);
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.9);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: opacity 0.3s ease;
+      transform: translateY(-50%);
+
+      &:hover,
+      &:active {
+        transform: translateY(-50%);
+      }
+    }
+
+    &:focus {
+      opacity: 1;
+    }
+
+    .image-carousel--controls-visible & {
+      opacity: 1;
+    }
+
+    svg {
+      width: var(--ms-1);
+      height: var(--ms-1);
+    }
+
+    &--prev {
+      left: var(--ms-0);
+    }
+
+    &--next {
+      right: var(--ms-0);
+    }
+  }
+}
+
+.image-carousel__counter {
+  position: absolute;
+  top: var(--ms-0);
+  right: var(--ms-0);
+  z-index: 2;
+  padding: var(--ms-02) var(--ms-01);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  background: rgb(var(--black-rgb) / 60%);
+  border-radius: var(--ms-0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+
+  &--visible {
+    opacity: 1;
+  }
+}
+
+.image-carousel__indicators {
+  position: absolute;
+  bottom: var(--ms-0);
+  left: 50%;
+  display: flex;
+  gap: var(--ms-02);
+  padding: var(--ms-02) var(--ms-01);
+  background: rgb(var(--black-rgb) / 40%);
+  border-radius: var(--ms-0);
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.image-carousel__indicator {
+  width: var(--ms-02);
+  height: var(--ms-02);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  @include button-variant(
+    $color: transparent,
+    $background: rgb(var(--white-rgb) / 50%),
+    $hover-color: transparent,
+    $hover-background: rgb(var(--white-rgb) / 70%),
+    $margin: 0,
+    $padding: 0,
+    $border-radius: 50%
+  );
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  &--active {
+    background: var(--white);
+    transform: scale(1.3);
+  }
+}

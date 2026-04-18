@@ -1,0 +1,180 @@
+// src/widgets/header/ui/style.scss
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+.header {
+  grid-area: header;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 3;
+  background: rgb(var(--extra-background-color-rgb) / 80%);
+  backdrop-filter: blur(20px) saturate(0.8%);
+  font-family: 'Oswald', sans-serif;
+
+  &__wrapper {
+    display: grid;
+    grid-template-columns: min-content min-content min-content;
+    place-items: center end;
+    gap: var(--ms-1);
+    block-size: calc(var(--ms-1) * 2);
+
+    @include breakpoint(desktops) {
+      grid-template-columns: min-content min-content 1fr min-content;
+    }
+
+    .logo {
+      text-decoration: none;
+      font-weight: var(--bold, 700);
+
+      @include link-colors(
+        --links-header-color,
+        --links-header-color-hover,
+        --links-header-color-active
+      );
+    }
+
+    .theme-toggler {
+      --theme-toggler-transition-duration: 0.3s;
+      --theme-toggler-transition-timing: ease;
+
+      display: grid;
+      place-items: center;
+
+      &__label {
+        cursor: pointer;
+
+        .theme-toggler__control {
+          display: none;
+
+          & + div {
+            position: relative;
+            border-radius: 50%;
+            box-shadow: inset 13px -13px 0 0 var(--theme-toggler-color, #998238);
+            transition:
+              box-shadow var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing),
+              transform var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+            transform: scale(1) rotate(-2deg);
+            inline-size: var(--ms-1);
+            block-size: var(--ms-1);
+
+            &::before {
+              position: absolute;
+              border-radius: inherit;
+              transition: background var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+              content: '';
+              inline-size: inherit;
+              block-size: inherit;
+              inset-inline-start: 0;
+              inset-block-start: 0;
+            }
+
+            &::after {
+              position: absolute;
+              margin: -4px 0 0 -4px;
+              border-radius: 50%;
+              box-shadow:
+                0 -20px 0 var(--theme-toggler-color, #998238),
+                0 20px 0 var(--theme-toggler-color, #998238),
+                20px 0 0 var(--theme-toggler-color, #998238),
+                -20px 0 0 var(--theme-toggler-color, #998238),
+                13px 13px 0 var(--theme-toggler-color, #998238),
+                -13px 13px 0 var(--theme-toggler-color, #998238),
+                13px -13px 0 var(--theme-toggler-color, #998238),
+                -13px -13px 0 var(--theme-toggler-color, #998238);
+              transition: transform var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+              transform: scale(0);
+              content: '';
+              inline-size: 8px;
+              block-size: 8px;
+              inset-block-start: 50%;
+              inset-inline-start: 50%;
+            }
+          }
+
+          &:checked + div {
+            box-shadow: inset 32px -32px 0 0 var(--theme-toggler-color, #998238);
+            transition:
+              transform var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing),
+              box-shadow var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+            transform: scale(0.5) rotate(0deg);
+
+            &::before {
+              background: var(--theme-toggler-color, #998238);
+              transition: background var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+            }
+
+            &::after {
+              transition: transform var(--theme-toggler-transition-duration)
+                var(--theme-toggler-transition-timing);
+              transform: scale(1.5);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.controls {
+  display: flex;
+}
+
+.lang-menu {
+  position: relative;
+
+  .lang-current {
+    font-weight: bold;
+    width: 40.25px;
+    height: 40.25px;
+
+    @include button-variant(
+      $color: var(--button-lang-menu-color, #998238),
+      $margin: 0,
+      $padding: 0,
+      $border-radius: 50%
+    );
+  }
+
+  .lang-list {
+    position: absolute;
+    top: 100%;
+    left: -7px;
+    z-index: 100;
+    padding: 0;
+    background: rgba(var(--extra-background-color-rgb) / 80%);
+    border-radius: var(--ms-01);
+    list-style: none;
+    margin-top: var(--ms-0);
+
+    &.is-hidden {
+      display: none;
+    }
+
+    li {
+      padding: var(--ms-01) var(--ms-0);
+
+      .lang-option {
+        color: var(--links-header-color, #dddddd);
+        background: transparent;
+        border: none;
+        appearance: none;
+        cursor: pointer;
+
+        &.active {
+          color: var(--button-lang-menu-color, #998238);
+        }
+
+        &:hover {
+          color: var(--button-lang-menu-color-hover, #ffffff);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+// src/scss/themes/_light.scss
+// Светлая тема: как избегаем «мигания» и что чем перекрывает.
+
+// До появления theme-light/theme-dark браузер берёт fallback-значения (у нас они тёмные) → первый рендер тёмный.
+// Если система = light, @media (prefers-color-scheme: light) успевает раньше JS и задаёт светлые переменные на html.
+// Когда JS добавит theme-light/theme-dark, эти классы по специфичности перекроют и fallback’и, и медиаблок.
+// Итого: fallback — запасной вариант; медиаблок — мгновенный светлый старт без «мигания».
+
+@use '../abstracts/mixins' as *;
+
+html.theme-light {
+  @include light-theme-variables;
+}
+
+@media (prefers-color-scheme: light) {
+  // При системной светлой теме сразу задаём светлые переменные — без ожидания JS и без «мигания».
+  html {
+    @include light-theme-variables;
+  }
+}

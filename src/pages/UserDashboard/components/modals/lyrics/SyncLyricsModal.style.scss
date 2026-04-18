@@ -1,0 +1,413 @@
+// src/pages/UserDashboard/components/SyncLyricsModal.style.scss
+@use '../../../../../scss/abstracts/mixins' as *;
+
+dialog {
+  // Общие стили для всех кнопок в попапе
+  button {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .sync-lyrics-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--ms-2);
+    background: transparent;
+
+    &__card {
+      padding: var(--ms-2);
+      gap: var(--ms-1);
+      overflow-y: auto;
+
+      @include dashboard-modal-card;
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ms-0);
+    }
+
+    &__title {
+      margin: 0;
+      padding: 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--dashboard-heading-font-size);
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
+
+    &__close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(var(--ms-1) * 1.5);
+      height: calc(var(--ms-1) * 1.5);
+      padding: 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-1);
+      font-weight: 300;
+      line-height: 1;
+      background: transparent;
+      border: none;
+      border-radius: var(--ms-02);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+
+      &:hover {
+        color: var(--dashboard-text-primary);
+        background: var(--dashboard-hover-bg);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &__divider {
+      width: calc(100% + var(--ms-2) * 2);
+      height: 1px;
+      background: var(--dashboard-hover-bg);
+      margin-left: calc(var(--ms-2) * -1);
+      margin-right: calc(var(--ms-2) * -1);
+    }
+
+    &__player {
+      display: flex;
+      align-items: center;
+      gap: var(--ms-0);
+      padding: var(--ms-1) 0;
+    }
+
+    &__play-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(var(--ms-1) * 2);
+      height: calc(var(--ms-1) * 2);
+      padding: 0;
+      color: var(--dashboard-text-primary);
+      background: transparent;
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+
+      svg {
+        width: calc(var(--ms-0) * 1.2);
+        height: calc(var(--ms-0) * 1.2);
+      }
+
+      &:hover {
+        background: var(--dashboard-hover-bg);
+        border-color: var(--dark-greenish-yellow);
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &__time {
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      min-width: calc(var(--ms-0) * 3);
+      flex-shrink: 0;
+    }
+
+    &__progress-bar {
+      position: relative;
+      height: 4px;
+      background: var(--dashboard-hover-bg);
+      border-radius: 2px;
+      flex: 1;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    &__progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: var(--dark-greenish-yellow);
+      border-radius: 2px;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    &__duration {
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      min-width: calc(var(--ms-0) * 3);
+      flex-shrink: 0;
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 200px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    &__loading,
+    &__empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--ms-2);
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      text-align: center;
+    }
+
+    &__table {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    &__table-header {
+      display: grid;
+      grid-template-columns: 40px 1fr 100px 120px 40px;
+      gap: var(--ms-01);
+      padding: var(--ms-01) var(--ms-0);
+      border-bottom: 1px solid var(--dashboard-divider);
+    }
+
+    &__table-body {
+      display: flex;
+      flex-direction: column;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    &__table-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 100px 120px 40px;
+      gap: var(--ms-01);
+      padding: var(--ms-01) var(--ms-0);
+      border-bottom: 1px solid var(--dashboard-divider);
+      transition: background-color 0.2s;
+
+      &:hover {
+        background: var(--dashboard-hover-bg);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &__table-col {
+      display: flex;
+      align-items: center;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 400;
+      line-height: 1.5;
+
+      &--number {
+        justify-content: center;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+
+      &--lyrics {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &--start,
+      &--end {
+        justify-content: flex-start;
+        flex-shrink: 0;
+      }
+
+      &--clear {
+        justify-content: center;
+        flex-shrink: 0;
+      }
+    }
+
+    &__time-btn {
+      cursor: pointer;
+      font-size: var(--ms-0);
+      font-variant-numeric: tabular-nums;
+      min-width: calc(var(--ms-0) * 4);
+
+      @include button-variant(
+        $color: var(--dashboard-text-primary),
+        $background: var(--dashboard-hover-bg),
+        $hover-color: var(--dashboard-text-primary),
+        $hover-background: var(--dashboard-button-primary-bg),
+        $margin: 0,
+        $padding: var(--ms-01) var(--ms-0),
+        $border: 1px solid var(--dashboard-card-border),
+        $border-radius: var(--ms-01)
+      );
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      &--set {
+        min-width: calc(var(--ms-0) * 5);
+      }
+    }
+
+    &__time-disabled {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      font-variant-numeric: tabular-nums;
+      opacity: 0.5;
+      user-select: none;
+    }
+
+    &__clear-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(var(--ms-0) * 1.5);
+      height: calc(var(--ms-0) * 1.5);
+      padding: 0;
+      color: var(--dashboard-text-primary);
+      font-size: var(--ms-0);
+      font-weight: 300;
+      line-height: 1;
+      background: transparent;
+      border: 1px solid var(--dashboard-card-border);
+      border-radius: var(--ms-02);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+
+      &:hover {
+        color: var(--dashboard-text-primary);
+        background: var(--moon-ash);
+        border-color: var(--pink-terracotta);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ms-0);
+    }
+
+    &__actions-right {
+      display: flex;
+      align-items: center;
+      gap: var(--ms-0);
+    }
+
+    &__button {
+      &--cancel {
+        @include dashboard-button;
+      }
+
+      &--primary {
+        @include dashboard-button;
+
+        // stylelint-disable-next-line no-duplicate-selectors
+        & {
+          color: var(--dashboard-card-bg);
+          background: var(--white);
+          border: 1px solid var(--dashboard-card-border);
+        }
+
+        &:hover {
+          color: var(--dashboard-card-bg);
+          background: var(--white);
+          opacity: 0.9;
+        }
+
+        &:active {
+          opacity: 0.8;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+      }
+    }
+
+    &__saved-indicator,
+    &__dirty-indicator {
+      color: var(--dashboard-text-secondary);
+      font-size: var(--ms-0);
+      font-weight: 400;
+    }
+
+    &__saved-indicator {
+      color: var(--honeydew-melon);
+    }
+
+    &__dirty-indicator {
+      color: var(--pink-terracotta);
+    }
+
+    @include breakpoint(phones) {
+      &__card {
+        padding: var(--ms-1);
+      }
+
+      &__table-header,
+      &__table-row {
+        grid-template-columns: 30px 1fr 80px 100px 30px;
+        gap: var(--ms-02);
+        padding: var(--ms-01);
+      }
+
+      &__table-col {
+        font-size: calc(var(--ms-0) * 0.9);
+
+        &--lyrics {
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
+        }
+      }
+
+      &__time-btn {
+        min-width: calc(var(--ms-0) * 3);
+        padding: var(--ms-02) var(--ms-01);
+        font-size: calc(var(--ms-0) * 0.9);
+      }
+    }
+  }
+}
+
+// Overlay для модалки поверх модалки
+dialog dialog::backdrop {
+  background: var(--dashboard-backdrop);
+  backdrop-filter: blur(4px);
+}

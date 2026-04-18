@@ -1,0 +1,149 @@
+// src/pages/UserDashboard/components/blocks/BlockSubtitle.tsx
+import React, { useRef, useEffect, useState } from 'react';
+import { FormatMenu } from './BlockParagraph';
+
+interface BlockSubtitleProps {
+  value: string;
+  onChange: (text: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onEnter?: (atEnd: boolean) => void;
+  onBackspace?: (isEmpty: boolean, atStart?: boolean) => void;
+  onFormat?: (type: 'bold' | 'italic' | 'link') => void;
+  placeholder?: string;
+  blockId?: string;
+}
+
+export function BlockSubtitle({
+  value,
+  onChange,
+  onFocus,
+  onBlur,
+  onEnter,
+  onBackspace,
+  onFormat,
+  placeholder = 'Подзаголовок',
+  blockId,
+}: BlockSubtitleProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showFormatMenu, setShowFormatMenu] = useState(false);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [value]);
+
+  // Обработчики для отслеживания выделения текста (включая существующий текст)
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const checkSelection = () => {
+      requestAnimationFrame(() => {
+        if (textarea.selectionStart !== textarea.selectionEnd) {
+          setShowFormatMenu(true);
+        } else {
+          setShowFormatMenu(false);
+        }
+      });
+    };
+
+    const handleNativeMouseUp = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          checkSelection();
+        });
+      });
+    };
+
+    const handleNativeSelect = () => {
+      checkSelection();
+    };
+
+    const handleNativeKeyUp = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          checkSelection();
+        });
+      });
+    };
+
+    const handleSelectionChange = () => {
+      if (document.activeElement === textarea) {
+        checkSelection();
+      }
+    };
+
+    textarea.addEventListener('mouseup', handleNativeMouseUp, true);
+    textarea.addEventListener('select', handleNativeSelect, true);
+    textarea.addEventListener('keyup', handleNativeKeyUp, true);
+    document.addEventListener('selectionchange', handleSelectionChange);
+
+    return () => {
+      textarea.removeEventListener('mouseup', handleNativeMouseUp, true);
+      textarea.removeEventListener('select', handleNativeSelect, true);
+      textarea.removeEventListener('keyup', handleNativeKeyUp, true);
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const isAtEnd = textarea.selectionStart === textarea.value.length;
+      onEnter?.(isAtEnd);
+    } else if (e.key === 'Backspace') {
+      const textarea = e.currentTarget;
+      const isAtStart = textarea.selectionStart === 0;
+      const isEmpty = value === '';
+
+      if (isEmpty) {
+        e.preventDefault();
+        onBackspace?.(true, isAtStart);
+      } else if (isAtStart) {
+        setTimeout(() => {
+          onBackspace?.(false, true);
+        }, 0);
+      }
+    }
+  };
+
+  return (
+    <h4>
+      <textarea
+        ref={textareaRef}
+        className="edit-article-v2__block edit-article-v2__block--subtitle"
+        data-block-id={blockId}
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={onFocus}
+        onBlur={(e) => {
+          setTimeout(() => {
+            if (document.activeElement !== textareaRef.current) {
+              setShowFormatMenu(false);
+            }
+          }, 100);
+          onBlur?.();
+        }}
+        placeholder={placeholder}
+        rows={1}
+      />
+      {showFormatMenu && (
+        <FormatMenu
+          textarea={textareaRef.current}
+          onFormat={onFormat}
+          onClose={() => setShowFormatMenu(false)}
+        />
+      )}
+    </h4>
+  );
+}

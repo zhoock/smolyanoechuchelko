@@ -1,0 +1,67 @@
+// src/shared/ui/hamburger/style.scss
+@use 'sass:color';
+
+// Импортируем общий файл с зависимостями
+@use '../../../scss/abstracts/mixins' as *;
+
+.hamburger {
+  position: fixed;
+  z-index: 1500;
+  background: none;
+  border: none;
+  transition: background-color 0.15s ease;
+  inset-block-start: 9px;
+  inset-inline-end: 29px;
+  inline-size: 40.25px;
+  block-size: 40.25px;
+  cursor: pointer;
+
+  @include button-variant(
+    $color: var(--button-lang-menu-color, #998238),
+    $margin: 0,
+    $padding: 0,
+    $border-radius: 50%
+  );
+
+  &:hover {
+    span {
+      background: var(--link-hamburger-color-hover, #ffffff);
+    }
+  }
+
+  .one,
+  .two,
+  .three {
+    display: block;
+    inline-size: var(--ms-0);
+    block-size: 3px;
+    margin: 4px auto;
+    background: var(--link-hamburger-color, #dddddd);
+    backface-visibility: hidden;
+    transition-duration: 0.15s;
+  }
+
+  &.active {
+    .one {
+      margin: 9px auto;
+      background: var(--link-hamburger-color-active, #ffffff);
+      transform: rotate(45deg) translate(7px, 7px);
+    }
+
+    .two {
+      opacity: 0;
+    }
+
+    .three {
+      margin: 9px auto;
+      background: var(--link-hamburger-color-active, #ffffff);
+      transform: rotate(-45deg) translate(10px, -10px);
+    }
+  }
+}
+
+.hero ~ .hamburger {
+  @include breakpoint(desktops) {
+    display: none;
+  }
+}

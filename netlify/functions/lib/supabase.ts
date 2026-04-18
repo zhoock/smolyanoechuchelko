@@ -1,6 +1,6 @@
 /**
  * Серверный конфиг Supabase для Netlify Functions
- * Не использует import.meta.env (работает только с process.env)
+ * Серверный конфиг: только process.env (Netlify Functions)
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';

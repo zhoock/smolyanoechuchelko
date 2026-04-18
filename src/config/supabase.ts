@@ -1,29 +1,17 @@
 /**
  * Конфигурация Supabase клиента
  *
- * Для работы нужны переменные окружения (см. документацию)
+ * Для работы нужны переменные окружения (см. документацию).
+ * В браузерной сборке значения подставляет webpack DefinePlugin (process.env).
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-// Получаем URL и ключ из переменных окружения
-// Для клиентской части (React) используем VITE_ префикс
-// Для серверной части (Netlify Functions) используем без префикса
 const getSupabaseUrl = (): string => {
-  if (typeof window !== 'undefined') {
-    // Клиентская часть - используем import.meta.env (поддерживается через webpack DefinePlugin)
-    return import.meta.env.VITE_SUPABASE_URL || '';
-  }
-  // Серверная часть (Netlify Functions) - используем VITE_ переменные
   return process.env.VITE_SUPABASE_URL || '';
 };
 
 const getSupabaseAnonKey = (): string => {
-  if (typeof window !== 'undefined') {
-    // Клиентская часть - используем import.meta.env (поддерживается через webpack DefinePlugin)
-    return import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-  }
-  // Серверная часть (Netlify Functions) - используем VITE_ переменные
   return process.env.VITE_SUPABASE_ANON_KEY || '';
 };
 
@@ -109,9 +97,7 @@ export const supabase = createSupabaseClient();
 export function createSupabaseAdminClient(): SupabaseClient | null {
   const supabaseUrl = getSupabaseUrl();
   const serviceRoleKey =
-    typeof window !== 'undefined'
-      ? import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || ''
-      : process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
   if (!supabaseUrl || !serviceRoleKey) {
     if (process.env.NODE_ENV !== 'production') {
@@ -134,4 +120,8 @@ export function createSupabaseAdminClient(): SupabaseClient | null {
 /**
  * Имя бакета для хранения медиа-файлов пользователей (изображения и аудио)
  */
-export const STORAGE_BUCKET_NAME = import.meta.env.VITE_STORAGE_BUCKET_NAME ?? '';
+export const STORAGE_BUCKET_NAME = process.env.VITE_STORAGE_BUCKET_NAME || '';
+
+if (!STORAGE_BUCKET_NAME) {
+  console.error('VITE_STORAGE_BUCKET_NAME is not defined');
+}

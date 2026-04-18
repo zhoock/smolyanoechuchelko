@@ -213,6 +213,28 @@ export function handleError(
   const errorMessage = error instanceof Error ? error.message : defaultMessage;
   console.error(`❌ Error in ${context}:`, error);
 
+  const pgCode =
+    typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code?: string }).code ?? '')
+      : '';
+
+  if (
+    errorMessage.includes('DATABASE_URL environment variable is not set') ||
+    errorMessage.includes('DATABASE_URL is not set')
+  ) {
+    return createErrorResponse(
+      500,
+      'DATABASE_URL is not set. Add it to .env (local) or Site settings → Environment variables (Netlify).'
+    );
+  }
+
+  if (errorMessage.includes('password authentication failed') || pgCode === '28P01') {
+    return createErrorResponse(
+      500,
+      'Database authentication failed. Update DATABASE_URL with the current database password from Supabase (Settings → Database → connection URI).'
+    );
+  }
+
   // Проверяем, является ли ошибка проблемой сетевого подключения
   const isNetworkError =
     errorMessage.includes('ETIMEDOUT') ||

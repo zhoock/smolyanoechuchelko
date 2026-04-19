@@ -427,8 +427,15 @@ export function getStorageFileUrl(options: GetFileUrlOptions): string {
 
   const storagePath = getStoragePath(userId, category, fileName);
 
-  // Для аудио лучше использовать прямой публичный URL, чтобы браузер корректно получал метаданные
+  // Для аудио — только прямой публичный URL Supabase Storage (без локального /audio/)
   if (category === 'audio') {
+    if (!STORAGE_BUCKET_NAME) {
+      console.error(
+        '[getStorageFileUrl] VITE_STORAGE_BUCKET_NAME is not set; cannot build audio Storage URL.'
+      );
+      return '';
+    }
+
     const supabase = createSupabaseClient();
     if (!supabase) {
       console.error('Supabase client is not available. Please set required environment variables.');
@@ -462,6 +469,13 @@ export async function getStorageSignedUrl(options: GetFileUrlOptions): Promise<s
   try {
     const defaultUserId = getUserUserId() || CURRENT_USER_CONFIG.userId;
     const { userId = defaultUserId, category, fileName, expiresIn = 3600 } = options;
+
+    if (!STORAGE_BUCKET_NAME) {
+      console.error(
+        '[getStorageSignedUrl] VITE_STORAGE_BUCKET_NAME is not set; cannot create signed URL.'
+      );
+      return null;
+    }
 
     const supabase = createSupabaseClient();
     if (!supabase) {

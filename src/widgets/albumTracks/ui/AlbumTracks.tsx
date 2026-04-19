@@ -14,13 +14,27 @@ import { getUserAudioUrl } from '@shared/api/albums';
 import './style.scss';
 
 /**
- * Преобразует треки, заменяя пути к аудио файлам на Supabase Storage URL, если это включено
+ * Преобразует треки: относительные пути → публичный URL Supabase Storage (getUserAudioUrl).
+ * Если src пустой, плеер не ставит audio.src → в Network не будет запросов к .wav.
  */
 function transformTracksForStorage(tracks: TracksProps[]): TracksProps[] {
-  return tracks.map((track) => ({
-    ...track,
-    src: getUserAudioUrl(track.src),
-  }));
+  let warnedEmptySrc = false;
+  return tracks.map((track) => {
+    const src = getUserAudioUrl(track.src);
+    if (
+      !warnedEmptySrc &&
+      !src &&
+      track.src &&
+      !String(track.src).startsWith('http') &&
+      process.env.NODE_ENV === 'development'
+    ) {
+      warnedEmptySrc = true;
+      console.error(
+        '[AlbumTracks] Пустой URL аудио: задайте в .env VITE_STORAGE_BUCKET_NAME, VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY, перезапустите dev. Иначе плеер не загрузит трек (в Network не будет запросов).'
+      );
+    }
+    return { ...track, src };
+  });
 }
 
 /**

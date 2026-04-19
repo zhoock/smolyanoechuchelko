@@ -123,5 +123,7 @@ export function createSupabaseAdminClient(): SupabaseClient | null {
 export const STORAGE_BUCKET_NAME = process.env.VITE_STORAGE_BUCKET_NAME || '';
 
 if (!STORAGE_BUCKET_NAME) {
-  console.error('VITE_STORAGE_BUCKET_NAME is not defined');
+  console.error(
+    'VITE_STORAGE_BUCKET_NAME is not set. Set it in .env (build) and Netlify. Storage URLs will be empty until it is defined.'
+  );
 }

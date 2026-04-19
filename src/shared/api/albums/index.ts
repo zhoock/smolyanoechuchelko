@@ -102,11 +102,10 @@ export function getUserImageUrl(
  * @returns URL аудио файла
  *
  * @example
- * getUserAudioUrl('23/01-Barnums-Fijian-Mermaid-1644.wav') // '/audio/23/01-Barnums-Fijian-Mermaid-1644.wav'
- * getUserAudioUrl('/audio/23/01-Barnums-Fijian-Mermaid-1644.wav') // '/audio/23/01-Barnums-Fijian-Mermaid-1644.wav' или Supabase Storage URL
- * getUserAudioUrl('EP_Mixer/01_PPB_drums.mp3', true) // Supabase Storage URL
+ * getUserAudioUrl('23/01-Barnums-Fijian-Mermaid-1644.wav') // Supabase Storage public URL
+ * getUserAudioUrl('EP_Mixer/01_PPB_drums.mp3') // Supabase Storage public URL
  */
-export function getUserAudioUrl(audioPath: string, useSupabaseStorage?: boolean): string {
+export function getUserAudioUrl(audioPath: string, _useSupabaseStorageLegacy?: boolean): string {
   // Если это уже полный URL (http:// или https://), возвращаем как есть
   if (audioPath.startsWith('http://') || audioPath.startsWith('https://')) {
     return audioPath;
@@ -115,27 +114,13 @@ export function getUserAudioUrl(audioPath: string, useSupabaseStorage?: boolean)
   // Убираем префикс /audio/ если он есть
   const normalizedPath = audioPath.startsWith('/audio/') ? audioPath.slice(7) : audioPath;
 
-  // Проверяем, нужно ли использовать Supabase Storage
-  const shouldUseStorage =
-    useSupabaseStorage !== undefined
-      ? useSupabaseStorage
-      : typeof window !== 'undefined'
-        ? process.env.VITE_USE_SUPABASE_STORAGE === 'true'
-        : process.env.USE_SUPABASE_STORAGE === 'true';
-
-  if (shouldUseStorage) {
-    // Используем Supabase Storage
-    // normalizedPath может быть с подпапками, например "23/01-Barnums-Fijian-Mermaid-1644.wav"
-    const userId = getUserUserId() || CURRENT_USER_CONFIG.userId;
-    return getStorageFileUrl({
-      userId,
-      category: 'audio',
-      fileName: normalizedPath,
-    });
-  }
-
-  // Локальные файлы
-  return `/audio/${normalizedPath}`;
+  // Только Supabase Storage (см. getStorageFileUrl — пустой VITE_STORAGE_BUCKET_NAME вернёт '')
+  const userId = getUserUserId() || CURRENT_USER_CONFIG.userId;
+  return getStorageFileUrl({
+    userId,
+    category: 'audio',
+    fileName: normalizedPath,
+  });
 }
 
 /**

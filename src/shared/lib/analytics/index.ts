@@ -8,7 +8,7 @@ declare global {
 const DEBUG_GA =
   (typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('debugGa') === '1') ||
-  (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
+  process.env.NODE_ENV !== 'production';
 
 export function gaEvent(name: string, params: Record<string, any> = {}) {
   if (DEBUG_GA) {

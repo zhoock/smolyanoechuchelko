@@ -256,7 +256,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     console.log('🚀 Начинаем миграцию JSON → БД...');
 
     // Загружаем JSON файлы из GitHub (как в клиентском коде)
-    const BASE_URL = 'https://raw.githubusercontent.com/zhoock/smolyanoe-chuchelko/main/src/assets';
+    const BASE_URL = 'https://raw.githubusercontent.com/zhoock/smolyanoechuchelko/main/src/assets';
 
     let albumsRu: AlbumData[];
     let albumsEn: AlbumData[];
